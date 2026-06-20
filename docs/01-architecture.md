@@ -21,7 +21,7 @@
 │   Isolation Forest ──────────────────┼──► composite score (0–100)    │
 │   NetworkX graph signals ────────────┘                               │
 │   SHAP TreeExplainer ──► exact attributions                          │
-│   Jaro-Winkler sanctions screening                                   │
+│   RapidFuzz sanctions screening (real OFAC SDN list)                 │
 │   Narrative layer (deterministic | Claude) ──► grounded brief        │
 └──────────────────────────────────────────────────────────────────────┘
 ```
@@ -96,7 +96,8 @@ darksentinel/
 │   │   ├── explain/
 │   │   │   ├── shap_explainer.py    # exact per-prediction attributions
 │   │   │   └── narrative.py         # deterministic | Claude grounded brief
-│   │   ├── sanctions/screening.py   # Jaro-Winkler name matching
+│   │   ├── sanctions/screening.py   # RapidFuzz matching over real OFAC index
+│   │   ├── scripts/ingest_sanctions.py # downloads + normalizes live OFAC SDN/ALT/ADD
 │   │   ├── schemas.py               # Pydantic request/response contracts
 │   │   └── api/main.py              # FastAPI app: /health /model /score
 │   ├── scripts/

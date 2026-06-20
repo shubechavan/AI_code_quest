@@ -65,13 +65,14 @@ function Detail({ detail, canReport }) {
             <CardBody className="flex flex-col items-center">
               <ScoreGauge score={a.compositeScore} band={a.riskBand} />
               <div className="mt-4 w-full space-y-2 border-t border-neutral-100 pt-4">
-                <Component label="Supervised probability" value={fmtPercent(a.supervisedProbability)} weight="primary" />
-                <Component label="Anomaly score" value={a.anomalyScore.toFixed(2)} />
-                <Component label="Graph risk" value={a.graphRisk.toFixed(2)} />
+                <Component label="Fraud probability" value={fmtPercent(a.supervisedProbability)} weight="0.60" />
+                <Component label="Anomaly score" value={a.anomalyScore.toFixed(2)} weight="0.15" />
+                <Component label="Graph risk" value={a.graphRisk.toFixed(2)} weight="0.15" />
+                <Component label="Sanctions risk" value={(a.sanctionsRisk ?? 0).toFixed(2)} weight="0.10" />
               </div>
               <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">
-                Composite blends a calibrated XGBoost probability with Isolation-Forest
-                anomaly detection; graph risk can only raise the score.
+                Composite = 0.60·fraud + 0.15·anomaly + 0.15·graph + 0.10·sanctions, each
+                an independently computed signal.
               </p>
             </CardBody>
           </Card>
@@ -173,9 +174,9 @@ function Component({ label, value, weight }) {
     <div className="flex items-center justify-between text-sm">
       <span className="text-neutral-500">
         {label}
-        {weight === 'primary' && (
-          <span className="ml-1.5 rounded bg-neutral-100 px-1 py-0.5 text-[10px] font-medium text-neutral-500">
-            primary
+        {weight && (
+          <span className="ml-1.5 rounded bg-neutral-100 px-1 py-0.5 text-[10px] font-medium tnum text-neutral-500">
+            ×{weight}
           </span>
         )}
       </span>
@@ -196,6 +197,7 @@ function Row({ label, value, mono }) {
 function ContributingFactors({ factors }) {
   const model = factors.filter((f) => f.source === 'model');
   const graph = factors.filter((f) => f.source === 'graph');
+  const sanctions = factors.filter((f) => f.source === 'sanctions');
   return (
     <Card>
       <CardHeader title="Contributing factors" description="The grounded evidence the brief is built from" />
@@ -206,20 +208,24 @@ function ContributingFactors({ factors }) {
         {graph.map((f, i) => (
           <Factor key={`g${i}`} source="Graph" label={f.label} detail={f.path ? f.path.join(' → ') : ''} accent />
         ))}
+        {sanctions.map((f, i) => (
+          <Factor key={`s${i}`} source="Sanctions" label={f.label} detail={`match risk ${f.value}`} danger />
+        ))}
         {factors.length === 0 && <p className="text-sm text-neutral-500">No strong contributing factors.</p>}
       </CardBody>
     </Card>
   );
 }
 
-function Factor({ source, label, detail, accent }) {
+function Factor({ source, label, detail, accent, danger }) {
+  const tone = danger
+    ? 'bg-red-50 text-red-700'
+    : accent
+      ? 'bg-accent-50 text-accent-700'
+      : 'bg-neutral-100 text-neutral-500';
   return (
     <div className="flex items-start gap-3">
-      <span
-        className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${
-          accent ? 'bg-accent-50 text-accent-700' : 'bg-neutral-100 text-neutral-500'
-        }`}
-      >
+      <span className={`mt-0.5 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${tone}`}>
         {source}
       </span>
       <div>

@@ -93,6 +93,7 @@ class ScoreResponse(BaseModel):
     supervised_probability: float
     anomaly_score: float
     graph_risk: float
+    sanctions_risk: float
     explanation: ExplanationOut
     graph_signals: GraphSignalsOut | None
     contributing_factors: list[dict]

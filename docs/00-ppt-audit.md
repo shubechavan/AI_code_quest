@@ -40,7 +40,8 @@ flattering summary.
 5. **"Finds shortest path to any sanctioned entity" needs the sanctioned entities to be
    *in the graph*.** Sanctions screening (name matching) and graph proximity (account
    adjacency) are two different things the deck conflates. We implemented both and kept
-   them distinct: Jaro-Winkler name screening *and* shortest-path-to-flagged-node.
+   them distinct: RapidFuzz name screening (over the real OFAC list) *and*
+   shortest-path-to-flagged-node.
 6. **No mention of training/serving skew, leakage, or threshold choice.** These are the
    things that actually break ML in production. We addressed them: a single feature module
    shared by train and serve, a time-based split, SMOTE on the train fold only.

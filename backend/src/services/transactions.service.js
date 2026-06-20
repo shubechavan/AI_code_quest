@@ -48,6 +48,7 @@ export async function analyzeTransaction({
     supervisedProbability: scored.supervised_probability,
     anomalyScore: scored.anomaly_score,
     graphRisk: scored.graph_risk,
+    sanctionsRisk: scored.sanctions_risk,
     explanation: scored.explanation,
     graphSignals: scored.graph_signals,
     graphEdges,

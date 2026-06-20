@@ -5,14 +5,17 @@
 - Python 3.12+ with the ML stack (`pip install -r ml-service/requirements.txt`)
 - Node.js 20+
 
-All three services run locally with no database or cloud account required.
+All three services run locally with no database or cloud account required. Sanctions
+ingestion needs outbound internet to reach the public OFAC list (falls back to a sample
+offline).
 
 ## Start (three terminals)
 
 ```bash
-# 1. ML service — train once (~20s), then serve
+# 1. ML service — train once (~20s), ingest real OFAC data, then serve
 cd ml-service
 python scripts/train_model.py        # writes ./artifacts/*.joblib + metadata
+python scripts/ingest_sanctions.py   # downloads live OFAC SDN list (~19k entities)
 python scripts/seed_scenarios.py     # writes ./data/demo_scenarios.json
 uvicorn darksentinel.api.main:app --port 8000
 
@@ -43,7 +46,7 @@ The login screen has one-click buttons to fill each account.
 
 | Scenario | Score | What it demonstrates |
 | --- | --- | --- |
-| **Mule funnel → sanctioned entity** | ~99 critical | All three layers fire: model flags the account-draining transfer, the graph finds the funnel (fan-in 2) one hop from a sanctioned account, and name screening matches OFAC. |
+| **Mule funnel → sanctioned entity** | ~97 critical | All four signals fire: model flags the account-draining transfer (fraud 1.0), Isolation Forest flags the anomaly (0.94), the graph finds the funnel one hop from a sanctioned account (0.95), and the counterparty name fuzzy-matches a **real OFAC SDN entity** — "NORDSTRAND MARITIME AND TRADING COMPANY" — at 92% (sanctions 0.92). |
 | **Large overnight unreconciled transfer** | ~95 critical | Model-driven: a high-value transfer whose destination credit is unaccounted for, plus a sanctions name match — with *no* graph structure, showing the model stands alone. |
 | **Routine merchant payment** | ~8 low | The control case. A normal payment that reconciles cleanly scores low — proving the system is not just flagging everything. |
 

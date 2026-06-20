@@ -36,6 +36,7 @@ class RiskAssessment:
     supervised_probability: float   # calibrated 0-1
     anomaly_score: float            # 0-1
     graph_risk: float               # 0-1
+    sanctions_risk: float           # 0-1
     explanation: Explanation
     graph_signals: AccountGraphSignals | None = None
     contributing_factors: list[dict] = field(default_factory=list)
@@ -77,6 +78,7 @@ class CompositeScorer:
         self,
         transaction: dict,
         graph_signals: AccountGraphSignals | None = None,
+        sanctions_risk: float = 0.0,
     ) -> RiskAssessment:
         features = build_features_single(transaction)
 
@@ -89,20 +91,24 @@ class CompositeScorer:
         anomaly = float(self.anomaly_scaler.transform([[if_raw]])[0, 0])
         anomaly = min(1.0, max(0.0, anomaly))
 
-        # 3. Composite. Supervised is primary; anomaly is a secondary lens. Graph risk,
-        #    when available, can only *raise* the score (it never exonerates).
-        composite01 = (
-            config.SUPERVISED_WEIGHT * prob + config.ANOMALY_WEIGHT * anomaly
-        )
+        # 3. Structural and sanctions signals.
         graph_risk = graph_signals.graph_risk if graph_signals else 0.0
-        if graph_risk:
-            composite01 = composite01 + (1 - composite01) * 0.5 * graph_risk
-        composite = round(composite01 * 100, 1)
+        sanctions_risk = min(1.0, max(0.0, sanctions_risk))
 
-        # 4. Exact SHAP attribution.
+        # 4. Composite — the four-signal weighted blend (weights sum to 1.0):
+        #    0.60·fraud + 0.15·anomaly + 0.15·graph + 0.10·sanctions
+        composite01 = (
+            config.SUPERVISED_WEIGHT * prob
+            + config.ANOMALY_WEIGHT * anomaly
+            + config.GRAPH_WEIGHT * graph_risk
+            + config.SANCTIONS_WEIGHT * sanctions_risk
+        )
+        composite = round(min(1.0, composite01) * 100, 1)
+
+        # 5. Exact SHAP attribution.
         explanation = explain_row(self.explainer, features)
 
-        assessment = RiskAssessment(
+        return RiskAssessment(
             transaction_id=transaction.get("transaction_id", "unknown"),
             model_version=self.metadata["model_version"],
             composite_score=composite,
@@ -110,15 +116,19 @@ class CompositeScorer:
             supervised_probability=round(prob, 4),
             anomaly_score=round(anomaly, 4),
             graph_risk=round(graph_risk, 4),
+            sanctions_risk=round(sanctions_risk, 4),
             explanation=explanation,
             graph_signals=graph_signals,
-            contributing_factors=self._contributing_factors(explanation, graph_signals),
+            contributing_factors=self._contributing_factors(
+                explanation, graph_signals, sanctions_risk
+            ),
         )
-        return assessment
 
     @staticmethod
     def _contributing_factors(
-        explanation: Explanation, graph: AccountGraphSignals | None
+        explanation: Explanation,
+        graph: AccountGraphSignals | None,
+        sanctions_risk: float = 0.0,
     ) -> list[dict]:
         """The grounded evidence list handed to the narrative layer.
 
@@ -157,6 +167,13 @@ class CompositeScorer:
                     "feature": "betweenness_centrality",
                     "value": graph.betweenness_centrality,
                 })
+        if sanctions_risk > 0:
+            factors.append({
+                "source": "sanctions",
+                "label": "Counterparty matches a sanctioned entity",
+                "feature": "sanctions_risk",
+                "value": round(sanctions_risk, 3),
+            })
         return factors
 
 

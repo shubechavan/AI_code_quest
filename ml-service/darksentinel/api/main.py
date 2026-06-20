@@ -100,11 +100,22 @@ def score(req: ScoreRequest) -> ScoreResponse:
             seed_risk=seed,
         )
 
-    # 2. Composite score + SHAP explanation.
-    assessment: RiskAssessment = scorer.score(tx, graph_signals=graph_signals)
+    # 2. Sanctions screening on the counterparty name (real OFAC index, RapidFuzz).
+    #    Derive a sanctions_risk in [0,1] from the match similarity and the matched
+    #    entity's FATF country risk, so it can feed the composite score (0.10 weight).
+    sanctions = _state["sanctions"]
+    name = tx.get("counterparty_name")
+    hit = sanctions.screen(name) if name else None
+    sanctions_risk = 0.0
+    if hit:
+        country_component = sanctions.country_risk_score(hit.country)
+        sanctions_risk = max(hit.similarity / 100.0, country_component)
+    sanctions_summary = sanctions.summarise(name)
 
-    # 3. Sanctions screening on the counterparty name (if provided).
-    sanctions_summary = _state["sanctions"].summarise(tx.get("counterparty_name"))
+    # 3. Composite score + SHAP explanation (sanctions folded into the blend).
+    assessment: RiskAssessment = scorer.score(
+        tx, graph_signals=graph_signals, sanctions_risk=sanctions_risk
+    )
 
     # 4. Grounded narrative brief.
     brief = None
@@ -125,6 +136,7 @@ def _to_response(a: RiskAssessment, brief) -> ScoreResponse:
         supervised_probability=a.supervised_probability,
         anomaly_score=a.anomaly_score,
         graph_risk=a.graph_risk,
+        sanctions_risk=a.sanctions_risk,
         explanation={
             "base_value": a.explanation.base_value,
             "raw_margin": a.explanation.raw_margin,

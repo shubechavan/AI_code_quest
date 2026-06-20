@@ -32,7 +32,9 @@ SCENARIOS = [
             "step": 14, "type": "TRANSFER", "amount": 88000.0,
             "nameOrig": "C551903", "oldbalanceOrg": 88000.0, "newbalanceOrig": 0.0,
             "nameDest": "C999001", "oldbalanceDest": 2000.0, "newbalanceDest": 2000.0,
-            "counterparty_name": "Helios Marine",
+            # Real OFAC SDN entity (CUBA program); a deliberately fuzzed spelling to
+            # demonstrate RapidFuzz matching against the live sanctions list.
+            "counterparty_name": "Nordstrand Maritime & Trading Co",
         },
         "graph_edges": [
             {"source": "C840291", "target": "C551903", "amount": 52000.0, "timestamp": 11},

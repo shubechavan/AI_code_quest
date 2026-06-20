@@ -30,13 +30,16 @@ EXPLAINER_PATH = ARTIFACTS_DIR / "shap_explainer.joblib"
 METADATA_PATH = ARTIFACTS_DIR / "model_metadata.json"
 
 # --- Scoring conventions -------------------------------------------------------------
-# The composite score blends the calibrated supervised probability with the normalised
-# anomaly score. Weights are deliberately conservative: the supervised model is the
-# primary signal; anomaly detection is a secondary lens that mainly *raises* attention
-# on transactions the classifier has not seen patterns for.
-SUPERVISED_WEIGHT = float(os.getenv("DS_SUPERVISED_WEIGHT", "0.75"))
-ANOMALY_WEIGHT = float(os.getenv("DS_ANOMALY_WEIGHT", "0.25"))
-assert abs(SUPERVISED_WEIGHT + ANOMALY_WEIGHT - 1.0) < 1e-9
+# Composite risk score is a weighted blend of four independent signals. The supervised
+# model dominates; anomaly, graph structure, and sanctions proximity are secondary lenses
+# that mostly raise attention. Weights are configurable but sum to 1.0.
+#
+#   risk = 0.60·fraud_probability + 0.15·anomaly + 0.15·graph_risk + 0.10·sanctions_risk
+SUPERVISED_WEIGHT = float(os.getenv("DS_SUPERVISED_WEIGHT", "0.60"))
+ANOMALY_WEIGHT = float(os.getenv("DS_ANOMALY_WEIGHT", "0.15"))
+GRAPH_WEIGHT = float(os.getenv("DS_GRAPH_WEIGHT", "0.15"))
+SANCTIONS_WEIGHT = float(os.getenv("DS_SANCTIONS_WEIGHT", "0.10"))
+assert abs(SUPERVISED_WEIGHT + ANOMALY_WEIGHT + GRAPH_WEIGHT + SANCTIONS_WEIGHT - 1.0) < 1e-9
 
 # Risk band thresholds on the composite score (0-100). These map a continuous score to
 # the discrete triage buckets an analyst queue actually uses.

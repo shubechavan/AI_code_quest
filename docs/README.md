@@ -9,6 +9,7 @@
 | [04 — API](04-api.md) | Every endpoint: method, route, request/response, RBAC matrix |
 | [05 — Demo & run book](05-demo.md) | Setup, credentials, seeded scenarios, demo script, judge Q&A |
 | [06 — Build order](06-build-order.md) | The order code was written in and why it minimizes risk |
+| [07 — Transformation roadmap](07-transformation-roadmap.md) | Honest status of every spec capability (done / partial / needs-infra / planned) and the sequenced plan to production |
 
 Start with [05 — Demo & run book](05-demo.md) to get the system running, and
 [00 — PPT audit](00-ppt-audit.md) to understand the engineering judgement behind the scope.

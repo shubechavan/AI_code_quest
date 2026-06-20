@@ -47,6 +47,20 @@ matches, so nothing downstream changes. The original brief's other datasets map 
 | OFAC SDN / UN Consolidated | Merged sanctions index (Jaro-Winkler screening) |
 | FATF high-risk jurisdictions | Country-risk feature |
 
-The slice ships a small, clearly-fictional sample sanctions list in
-[`sanctions/screening.py`](../ml-service/darksentinel/sanctions/screening.py);
-replace `load_index()` with a parser over the real merged OFAC+UN export for production.
+## Sanctions data is real
+
+Unlike the transaction data, the sanctions screening uses the **live OFAC SDN list**,
+which is publicly downloadable with no authentication.
+[`scripts/ingest_sanctions.py`](../ml-service/scripts/ingest_sanctions.py) downloads and
+parses the real SDN + ALT (aliases) + ADD (addresses) exports — **19,073 entities, 20,292
+aliases** — into a normalized index, and screening matches counterparty names against it
+with RapidFuzz. FATF high-risk jurisdictions feed a country-risk signal. The UN Consolidated
+list plugs into the same ingestion shape (planned).
+
+```bash
+cd ml-service
+python scripts/ingest_sanctions.py        # downloads live OFAC, writes data/processed/
+```
+
+If the index has not been ingested, screening falls back to a small clearly-fictional
+sample so the service still runs offline — but the production path is the real list.
