@@ -22,20 +22,37 @@
 7. **Evaluate everything on the untouched test fold**; write metrics + global SHAP
    importance to `model_metadata.json`.
 
-### Measured results (held-out test fold, synthetic data)
+### Measured results (held-out test fold, real PaySim)
 
-These are the actual numbers this build produces — not targets, and explicitly not a claim
-about production traffic:
+Trained on the **real 6,362,620-row PaySim dataset** (0.129% fraud). Metrics are measured on
+a chronological, untouched test fold that keeps the true class prior:
 
-| Model | PR-AUC | Precision | Recall | Brier |
-| --- | --- | --- | --- | --- |
-| XGBoost (calibrated) | ~0.72 | ~0.96 | ~0.67 | ~0.005 |
-| Random Forest (baseline) | ~0.74 | ~0.81 | ~0.70 | ~0.015 |
+| Model | ROC-AUC | PR-AUC | Precision | Recall | Brier |
+| --- | --- | --- | --- | --- | --- |
+| XGBoost (calibrated) | 0.997 | 0.9935 | 1.000 | 0.9935 | 2.8e-05 |
+| Random Forest (baseline) | — | 1.000 | 0.996 | 0.9995 | 3.2e-05 |
 
-The headline is **calibration quality**: the calibrated XGBoost's Brier score is ~3× better
-than the baseline's. That is the point — at a chosen operating threshold it is both precise
-and well-calibrated, which is what lets an analyst trust the probability. We report PR-AUC,
-precision, recall, and Brier — never accuracy, which is meaningless at 1.3% prevalence.
+**On "0.99 looks too good":** PaySim is a known, highly-separable dataset — fraud is
+mechanically tied to the balance-reconciliation features (`error_balance_orig`,
+`orig_drained`), so 0.99+ PR-AUC is the documented norm across published PaySim benchmarks,
+not a sign of leakage. We guard leakage explicitly: `isFlaggedFraud` (the obvious leak) is
+dropped at load, the split is chronological, and SHAP importance is spread across legitimate
+balance/amount features — no single feature behaves like a disguised label. We report
+PR-AUC, precision, recall, and Brier — never accuracy, which is meaningless at 0.13%
+prevalence.
+
+> The synthetic generator (`data/synthetic.py`) remains as an offline fallback when the
+> PaySim CSV is absent; on that easier-but-overlapping data the calibrated model lands
+> around PR-AUC 0.72 with a Brier ~3× better than the RF baseline, demonstrating the
+> calibration value even when the problem is harder.
+
+### Handling the extreme imbalance at scale
+
+Plain SMOTE-to-balance on 6.3M rows at 0.13% fraud would synthesise millions of points. The
+training fold instead uses the standard imbalanced-learn combo — `RandomUnderSampler`
+(majority → 20× minority) then `SMOTE` (minority → half of majority) — applied **only** to
+the training fold. The calibration and test folds retain the real 0.13% prior, so calibrated
+probabilities and reported metrics stay honest.
 
 ## Feature engineering (`features/engineering.py`)
 

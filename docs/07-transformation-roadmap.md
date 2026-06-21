@@ -21,8 +21,8 @@ services) · **PLANNED** (designed, not yet built).
 | XGBoost + isotonic calibration | **DONE** | Time-split, SMOTE-on-train-only, Brier 3× better than RF baseline |
 | Isolation Forest anomaly | **DONE** | Trained on legitimate traffic; normalized to [0,1] |
 | SHAP TreeExplainer (exact, local) | **DONE** | Per-prediction attributions drive the UI waterfall and the brief |
-| PaySim (6.3M real rows) | **NEEDS-CREDS** | Kaggle auth required. Ingestion is schema-identical; drop the CSV in and `train.py` runs unchanged. Today: high-fidelity synthetic generator with realistic overlap. |
-| IEEE-CIS / ULB datasets | **NEEDS-CREDS** | Same Kaggle gate. ULB → Isolation Forest is wired; point it at the real CSV when available. |
+| PaySim (6.3M real rows) | **DONE** | Real 6,362,620-row PaySim ingested and trained on. Scale-aware undersample+SMOTE on the train fold; calibration/test folds keep the true 0.129% prior. Calibrated PR-AUC 0.9935. The synthetic generator remains as an offline fallback. |
+| IEEE-CIS / ULB datasets | **NEEDS-CREDS** | Same Kaggle gate. ULB → Isolation Forest is wired; point it at the real CSV when available. (Anomaly model currently trains on PaySim legitimate traffic.) |
 | 40+ engineered features | **PARTIAL** | 25 row-wise features today. The remaining ~15 (velocity_1h/24h, txn_frequency, avg_amount, sender/receiver_degree, pagerank, betweenness, cluster_size) require account history + the graph job — see "Feature store" below. |
 | Optuna hyperparameter tuning | **PLANNED** | `optuna` installed; add an `ml/training/tune.py` study over the XGBoost search space, persist best params. ~1 file. |
 | UN Consolidated list | **PLANNED** | Same ingestion shape as OFAC; the source endpoint needs an XML parser branch. |

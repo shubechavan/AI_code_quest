@@ -35,9 +35,10 @@ React (analyst UI)
 Three terminals. See each service's `README.md` for detail.
 
 ```bash
-# 1. ML service — train once, then serve
+# 1. ML service — ingest real data, train, then serve
 cd ml-service
-python scripts/train_model.py        # builds ./artifacts/*.joblib (~1 min)
+python scripts/ingest_sanctions.py   # live OFAC SDN list (~19k entities)
+python scripts/train_model.py        # trains on real PaySim if present, else synthetic
 uvicorn darksentinel.api.main:app --port 8000
 
 # 2. API gateway
@@ -57,9 +58,10 @@ Default demo credentials and seeded scenarios are documented in
 1. **Explanations are computed, not generated.** The risk decision is the calibrated
    XGBoost probability. SHAP gives the exact contribution of each feature. The narrative
    layer is only allowed to restate those numbers in prose.
-2. **No placeholder metrics.** Every number shown in the UI traces to a real model
-   output on real (synthetic-but-realistic) data. Where we have not measured something,
-   we say so rather than inventing a figure.
+2. **No placeholder metrics.** Every number shown in the UI traces to a real model output —
+   the fraud model trains on the real 6.3M-row PaySim dataset, and sanctions screening runs
+   against the live OFAC SDN list. Where we have not measured something, we say so rather
+   than inventing a figure.
 3. **Auditability first.** Every score carries the model version, feature vector, and
    attribution that produced it.
 

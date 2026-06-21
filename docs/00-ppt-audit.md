@@ -24,11 +24,11 @@ flattering summary.
    goals"), which is honest, but a judge will still press on any number. We removed all
    unmeasured metrics from the product surface and show only metrics computed on a held-out
    test fold, labelled as such.
-2. **PaySim cannot be vendored and is not Indian UPI/NEFT data.** The deck leans on PaySim
-   as if it mirrors Indian rails. PaySim is mobile-money simulation; the *mechanics* (drain
-   + balance-error signals) transfer, the provenance claim does not. We built a synthetic
-   PaySim-schema generator with the same mechanics and label it clearly, rather than
-   overclaiming dataset realism.
+2. **PaySim is not Indian UPI/NEFT data.** The deck leans on PaySim as if it mirrors Indian
+   rails. PaySim is mobile-money simulation; the *mechanics* (drain + balance-error signals)
+   transfer, the provenance claim does not. We now train on the **real 6.3M-row PaySim
+   dataset** (with a synthetic same-schema fallback for offline runs), but we are explicit
+   that it is a simulator, not Indian rails — the model is rails-agnostic given the schema.
 3. **Seven MongoDB collections + microservices + WebSockets + multi-tenant + RBAC is not a
    3-day scope.** The deck describes a platform an org builds over quarters. Attempting all
    of it yields nothing that runs. We scoped a vertical slice that exercises every layer
@@ -67,7 +67,7 @@ flattering summary.
 | Brief says | Problem | What this build does |
 | --- | --- | --- |
 | 7 collections, microservices, WebSockets | Not 3-day scope | One gateway + one ML service; in-memory store behind a repo interface (Mongo-swap ready) |
-| PaySim mirrors UPI/NEFT | Provenance overclaim | Synthetic PaySim-schema generator, clearly labelled |
+| PaySim mirrors UPI/NEFT | Provenance overclaim | Real 6.3M-row PaySim trained on; rails-agnostic, not claimed as UPI |
 | Centrality on full graph | Too slow for serving | Local subgraph per case, sampled betweenness |
 | LLM generates the brief | Hallucination + demo fragility | LLM narrates grounded evidence only; deterministic default |
 | Impact percentages | Unmeasured | Only held-out test-fold metrics, labelled synthetic |

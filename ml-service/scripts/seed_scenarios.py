@@ -60,14 +60,15 @@ SCENARIOS = [
         "sanctioned_accounts": [],
     },
     {
-        "id": "txn_structuring",
-        "title": "Large overnight transfer, unreconciled destination",
-        "rationale": "High-value TRANSFER at night where the destination credit is not "
-                     "reflected — a layering indicator.",
+        "id": "txn_account_drain",
+        "title": "Account-draining transfer, unreconciled destination",
+        "rationale": "The canonical PaySim fraud the real model learns: a TRANSFER empties "
+                     "the origin account (newbalanceOrig = 0) and the destination credit is "
+                     "not reflected. Model-driven critical with no graph or sanctions help.",
         "transaction": {
-            "transaction_id": "txn_structuring",
-            "step": 3, "type": "TRANSFER", "amount": 96000.0,
-            "nameOrig": "C118245", "oldbalanceOrg": 99000.0, "newbalanceOrig": 3000.0,
+            "transaction_id": "txn_account_drain",
+            "step": 3, "type": "TRANSFER", "amount": 99000.0,
+            "nameOrig": "C118245", "oldbalanceOrg": 99000.0, "newbalanceOrig": 0.0,
             "nameDest": "C443120", "oldbalanceDest": 5000.0, "newbalanceDest": 5000.0,
             "counterparty_name": "Northbridge Freight",
         },

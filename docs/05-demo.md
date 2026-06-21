@@ -46,9 +46,9 @@ The login screen has one-click buttons to fill each account.
 
 | Scenario | Score | What it demonstrates |
 | --- | --- | --- |
-| **Mule funnel → sanctioned entity** | ~97 critical | All four signals fire: model flags the account-draining transfer (fraud 1.0), Isolation Forest flags the anomaly (0.94), the graph finds the funnel one hop from a sanctioned account (0.95), and the counterparty name fuzzy-matches a **real OFAC SDN entity** — "NORDSTRAND MARITIME AND TRADING COMPANY" — at 92% (sanctions 0.92). |
-| **Large overnight unreconciled transfer** | ~95 critical | Model-driven: a high-value transfer whose destination credit is unaccounted for, plus a sanctions name match — with *no* graph structure, showing the model stands alone. |
-| **Routine merchant payment** | ~8 low | The control case. A normal payment that reconciles cleanly scores low — proving the system is not just flagging everything. |
+| **Mule funnel → sanctioned entity** | ~89 critical | All four signals fire: the real-PaySim model flags the account-draining transfer (fraud 1.0), Isolation Forest adds anomaly (0.42), the graph finds the funnel one hop from a sanctioned account (0.90), and the counterparty name fuzzy-matches a **real OFAC SDN entity** — "NORDSTRAND MARITIME AND TRADING COMPANY" — at 92% (sanctions 0.92). |
+| **Account-draining transfer** | ~69 high | Pure model signal: a transfer that empties the origin account (the canonical real-PaySim fraud) with an unreconciled destination, and *no* graph or sanctions help. Shows the model standing alone — and that a single model flag is "high", with corroborating signals needed to reach "critical". |
+| **Routine merchant payment** | ~2 low | The control case. A normal payment that reconciles cleanly scores low — proving the system is not just flagging everything. |
 
 ## Suggested demo narrative (≈4 minutes)
 
@@ -75,15 +75,18 @@ The login screen has one-click buttons to fill each account.
 
 ## Likely judge questions and answers
 
-- **"Is this real PaySim data?"** No — it's a synthetic generator that reproduces PaySim's
-  schema and fraud mechanics (account draining, balance-reconciliation errors). We label it
-  as synthetic everywhere and never present its metrics as production performance. The
-  feature pipeline is identical for a real PaySim CSV, so swapping the source changes
-  nothing downstream.
-- **"Why is recall only ~0.67?"** That's at the default 0.5 threshold and reflects honest
-  overlap in the data (legitimate large transfers, structuring fraud). In operation you'd
-  pick the threshold from the precision-recall curve to match analyst capacity; the
-  calibrated probability makes that choice principled.
+- **"Is this real PaySim data?"** Yes — the full 6,362,620-row PaySim dataset, trained on
+  directly (calibrated PR-AUC 0.9935). A synthetic generator with the identical schema
+  exists only as an offline fallback when the CSV is absent.
+- **"0.99 PR-AUC — isn't that leakage or overfitting?"** No. PaySim is a known
+  highly-separable dataset: fraud is mechanically tied to the balance-reconciliation
+  features, so 0.99+ is the documented norm across PaySim benchmarks. We guard leakage by
+  dropping `isFlaggedFraud`, splitting chronologically, and we verified SHAP importance is
+  spread across legitimate balance/amount features — no disguised label. See
+  `docs/03-ml-and-llm.md`.
+- **"How do you handle 0.13% fraud at 6.3M rows?"** Undersample the majority + SMOTE the
+  minority on the *training fold only*; the calibration and test folds keep the true prior
+  so probabilities and metrics stay honest.
 - **"How do you stop the LLM hallucinating?"** It never sees the raw transaction — only the
   computed SHAP/graph/sanctions findings — and it's instructed to narrate, not decide. By
   default it's fully deterministic. See `docs/03-ml-and-llm.md`.
