@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DarkSentinel AI — Updated Presentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --base:    #0a0e16;
+    --surface: #111520;
+    --card:    #171d2b;
+    --border:  #222d42;
+    --fg:      #e4e8f0;
+    --muted:   #8fa3c8;
+    --cyan:    #1de9d6;
+    --green:   #22c55e;
+    --amber:   #f59e0b;
+    --rose:    #f43f5e;
+    --blue:    #3b82f6;
+    --purple:  #a855f7;
+    --accent:  #0ea5e9;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #1a1a2e;
+    color: var(--fg);
+    font-size: 14px;
+  }
+
+  /* ── PAGE / SLIDE ─────────────────────────────────────────── */
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    background: var(--base);
+    margin: 0 auto 40px;
+    padding: 48px 56px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan) 0%, var(--blue) 50%, var(--purple) 100%);
+  }
+
+  /* ── TYPOGRAPHY ───────────────────────────────────────────── */
+  .slide-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .14em;
+    color: var(--cyan); text-transform: uppercase; margin-bottom: 10px;
+  }
+  h1 { font-size: 52px; font-weight: 800; line-height: 1.1; }
+  h2 { font-size: 32px; font-weight: 700; color: var(--fg); margin-bottom: 6px; }
+  h3 { font-size: 14px; font-weight: 600; color: var(--fg); }
+  .subtitle { font-size: 18px; color: var(--muted); margin-top: 4px; margin-bottom: 20px; }
+  .section-note { font-size: 13px; color: var(--cyan); margin-bottom: 28px; }
+  ul { list-style: none; }
+  ul li { padding: 3px 0 3px 16px; position: relative; color: var(--muted); font-size: 13px; line-height: 1.55; }
+  ul li::before { content: '▸'; position: absolute; left: 0; color: var(--cyan); }
+
+  /* ── CARDS ────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+  .card-cyan   { border-color: var(--cyan); }
+  .card-green  { border-color: var(--green); }
+  .card-amber  { border-color: var(--amber); }
+  .card-rose   { border-color: var(--rose); }
+  .card-blue   { border-color: var(--blue); }
+  .card-purple { border-color: var(--purple); }
+
+  .card-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .badge {
+    padding: 4px 12px; border-radius: 5px; font-size: 11px; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+  }
+  .badge-cyan   { background: rgba(29,233,214,.18); color: var(--cyan); }
+  .badge-green  { background: rgba(34,197,94,.18);  color: var(--green); }
+  .badge-amber  { background: rgba(245,158,11,.18); color: var(--amber); }
+  .badge-rose   { background: rgba(244,63,94,.18);  color: var(--rose); }
+  .badge-blue   { background: rgba(59,130,246,.18); color: var(--blue); }
+  .badge-purple { background: rgba(168,85,247,.18); color: var(--purple); }
+
+  .card-title { font-size: 15px; font-weight: 700; color: var(--fg); }
+
+  /* ── GRIDS ────────────────────────────────────────────────── */
+  .grid-2  { display: grid; grid-template-columns: 1fr 1fr;     gap: 20px; }
+  .grid-3  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .grid-4  { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .grid-5  { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
+
+  /* ── TABLES ───────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th {
+    background: rgba(29,233,214,.12);
+    color: var(--cyan); font-weight: 700;
+    padding: 9px 14px; text-align: left; font-size: 11px; letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  td { padding: 8px 14px; border-bottom: 1px solid var(--border); color: var(--muted); }
+  tr.highlight td { color: var(--cyan); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── NOTICE BOXES ─────────────────────────────────────────── */
+  .notice {
+    background: rgba(29,233,214,.07);
+    border: 1px solid rgba(29,233,214,.25);
+    border-radius: 8px; padding: 14px 18px;
+    font-size: 12.5px; color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .notice strong { color: var(--cyan); }
+  .notice-amber {
+    background: rgba(245,158,11,.07);
+    border-color: rgba(245,158,11,.3);
+  }
+  .notice-amber strong { color: var(--amber); }
+
+  /* ── METRICS ──────────────────────────────────────────────── */
+  .metric-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px; text-align: center;
+  }
+  .metric-val  { font-size: 26px; font-weight: 800; color: var(--cyan); }
+  .metric-label{ font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ── PHASE CARDS ──────────────────────────────────────────── */
+  .phase-card { border-radius: 10px; padding: 18px 16px; position: relative; }
+  .phase-status {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px;
+  }
+  .done     { background: rgba(34,197,94,.18); color: var(--green); }
+  .partial  { background: rgba(245,158,11,.18); color: var(--amber); }
+  .roadmap  { background: rgba(244,63,94,.12); color: #ff6b8a; }
+
+  /* ── FLOW DIAGRAM ─────────────────────────────────────────── */
+  .arch-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-size: 12px;
+  }
+  .arch-title { font-weight: 700; font-size: 12px; margin-bottom: 6px; }
+  .arrow { text-align: center; color: var(--border); font-size: 18px; line-height: 1; }
+
+  /* ── TITLE SLIDE ──────────────────────────────────────────── */
+  .title-slide {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 720px; text-align: center;
+  }
+  .logo-box {
+    width: 120px; height: 120px; border-radius: 20px;
+    background: #141c2e; border: 2px solid var(--cyan);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; font-weight: 900; color: var(--cyan);
+    margin-bottom: 28px;
+    box-shadow: 0 0 40px rgba(29,233,214,.2);
+  }
+  .tag-row { display: flex; gap: 12px; margin: 24px 0 36px; justify-content: center; }
+  .tag-pill {
+    padding: 7px 22px; border-radius: 6px; font-size: 13px; font-weight: 700;
+    border: 1px solid;
+  }
+  .tag-cyan   { border-color: var(--cyan); color: var(--cyan); background: rgba(29,233,214,.08); }
+  .tag-green  { border-color: var(--green); color: var(--green); background: rgba(34,197,94,.08); }
+  .tag-amber  { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,.08); }
+
+  .team-row { font-size: 13px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+  .team-names { display: flex; gap: 48px; justify-content: center; font-size: 15px; font-weight: 500; color: var(--fg); }
+
+  /* ── PRINT ────────────────────────────────────────────────── */
+  @media print {
+    body { background: #0a0e16; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide { margin: 0; page-break-after: always; box-shadow: none; }
+  }
+  @page { size: 1280px 720px; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 1 — TITLE
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="title-slide">
+    <div class="slide-label">BHARAT ACADEMIX CODEQUEST 2026</div>
+    <div class="logo-box">DS</div>
+    <h1 style="font-size:60px;background:linear-gradient(135deg,#e4e8f0 30%,#1de9d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;">DarkSentinel AI</h1>
+    <p style="font-size:20px;color:var(--muted);max-width:600px;line-height:1.5;">Explainable Financial Crime and Risk Intelligence Platform</p>
+    <div class="tag-row">
+      <span class="tag-pill tag-cyan">AI and ML</span>
+      <span class="tag-pill tag-green">FinTech</span>
+      <span class="tag-pill tag-amber">Cybersecurity</span>
+    </div>
+    <div class="team-row">TEAM DARKSENTINEL</div>
+    <div class="team-names">
+      <span>Deven Mahajan</span>
+      <span>Akshat Kumar</span>
+      <span>Shubham Chavan</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 2 — PROBLEM STATEMENT (unchanged)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Problem Statement</h2>
+  <p class="section-note">Why current AML systems fail at scale in the Indian financial ecosystem</p>
+
+  <div class="notice" style="margin-bottom:24px;">
+    <strong>The Scale:</strong> Indian financial institutions process enormous and growing volumes of UPI, NEFT, RTGS and card transactions every month. Existing rule-based monitoring systems evaluate each transaction in isolation against static thresholds, with no ability to learn, adapt or explain their decisions.
+  </div>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="card card-cyan">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--cyan);color:#0a0e16;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">1</div>
+      <div class="card-title" style="color:var(--cyan);margin-bottom:10px;">Detection Gap</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">Rule-based systems evaluate transactions one at a time. They cannot detect coordinated multi-account schemes, layering structures or novel laundering patterns without manual rule updates.</p>
+      <hr style="border-color:var(--border);margin:14px 0;"/>
+      <p style="font-size:12px;color:#6a7fa0;font-style:italic;line-height:1.5;">Results in extremely high false-positive alert volumes that overwhelm analyst queues, and real financial crime passes through undetected.</p>
+    </div>
+    <div class="card card-amber">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--amber);color:#0a0e16;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">2</div>
+      <div class="card-title" style="color:var(--amber);margin-bottom:10px;">Explainability Gap</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">When a transaction is flagged, analysts receive only a rule code or threshold name, with no reasoning about which factors made it suspicious or how it compares to normal behaviour.</p>
+      <hr style="border-color:var(--border);margin:14px 0;"/>
+      <p style="font-size:12px;color:#6a7fa0;font-style:italic;line-height:1.5;">Every investigation starts from scratch, producing investigation paralysis and inconsistent decisions between analysts.</p>
+    </div>
+    <div class="card card-rose">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--rose);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">3</div>
+      <div class="card-title" style="color:var(--rose);margin-bottom:10px;">Access Gap</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">Enterprise-grade AML platforms such as NICE Actimize, Oracle FCCM and SAS AML carry licensing costs that place them completely out of reach for small FinTechs, cooperative banks and microfinance institutions.</p>
+      <hr style="border-color:var(--border);margin:14px 0;"/>
+      <p style="font-size:12px;color:#6a7fa0;font-style:italic;line-height:1.5;">The institutions most vulnerable to financial crime end up with the weakest monitoring infrastructure.</p>
+    </div>
+  </div>
+
+  <div class="notice notice-amber">
+    <strong>Net Result:</strong> Large institutions are over-alerted with false positives, small institutions remain under-protected due to cost, and in both cases analysts make critical decisions with inadequate information.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 3 — PROPOSED SOLUTION (corrected)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Proposed Solution</h2>
+  <p class="section-note">A four-layer analytical stack where each layer feeds grounded, computed data into the next</p>
+
+  <div class="grid-2">
+    <!-- Layer 1 -->
+    <div class="card card-cyan">
+      <div class="card-header">
+        <span class="badge badge-cyan">Layer 1</span>
+        <span class="card-title">Adaptive Risk Scoring Engine</span>
+      </div>
+      <ul>
+        <li>XGBoost gradient boosted classifier trained on the <strong style="color:var(--fg)">real 6.3M-row PaySim dataset</strong></li>
+        <li>25 engineered features covering transaction, balance, behavioural, temporal and network signals</li>
+        <li>Class imbalance handled with <strong style="color:var(--fg)">RandomUnderSampler + SMOTE</strong> applied to the training fold only</li>
+        <li>Isotonic Regression calibration so the output probability means what it says</li>
+        <li>Parallel Isolation Forest trained on <strong style="color:var(--fg)">legitimate traffic only</strong> for unsupervised anomaly detection</li>
+        <li>Composite score: <strong style="color:var(--cyan)">0.60·fraud + 0.15·anomaly + 0.15·graph + 0.10·sanctions</strong></li>
+      </ul>
+    </div>
+
+    <!-- Layer 2 -->
+    <div class="card card-green">
+      <div class="card-header">
+        <span class="badge badge-green">Layer 2</span>
+        <span class="card-title">Graph Intelligence Engine</span>
+      </div>
+      <ul>
+        <li>Transactions modelled as a directed graph where accounts are nodes and transfers are weighted edges (NetworkX)</li>
+        <li>Computes degree, betweenness and eigenvector centrality for every account</li>
+        <li>Detects money-mule receive-and-forward patterns via fan-in / fan-out analysis</li>
+        <li>Finds shortest directed paths between an account and any known sanctioned entity</li>
+        <li>Damped risk propagation: risky neighbours raise the account's structural risk score</li>
+        <li>All graph-derived signals collapse to an auditable <strong style="color:var(--fg)">graph_risk ∈ [0,1]</strong> feeding the composite score</li>
+      </ul>
+    </div>
+
+    <!-- Layer 3 -->
+    <div class="card card-amber">
+      <div class="card-header">
+        <span class="badge badge-amber">Layer 3</span>
+        <span class="card-title">SHAP Grounded Explainability</span>
+      </div>
+      <ul>
+        <li>SHAP TreeExplainer computes the <strong style="color:var(--fg)">exact additive contribution</strong> of every feature to one prediction</li>
+        <li>Attribution is mathematically derived and unique to each transaction — not a template</li>
+        <li>Analysts see precisely which features pushed the score up or down, and by how much</li>
+        <li>Top contributing factors are surfaced as a ranked waterfall chart in the analyst console</li>
+        <li>Forms the grounded input the narrative layer is permitted to narrate</li>
+        <li>Makes every decision traceable to a specific numerical attribution</li>
+      </ul>
+    </div>
+
+    <!-- Layer 4 -->
+    <div class="card card-blue">
+      <div class="card-header">
+        <span class="badge badge-blue">Layer 4</span>
+        <span class="card-title">Grounded Investigation Brief</span>
+      </div>
+      <ul>
+        <li>Narrative layer receives <strong style="color:var(--fg)">only the computed evidence</strong> (SHAP attributions, graph signals, sanctions outcome) — never the raw transaction</li>
+        <li>Explicitly instructed to narrate findings, not invent its own risk assessment</li>
+        <li>Cannot hallucinate a risk factor that was not first identified by the ML and graph layers</li>
+        <li>Produces a structured brief: risk summary, contributing factors, network concerns, sanctions status, and recommended action</li>
+        <li><strong style="color:var(--cyan)">Deterministic by default</strong> (reproducible, no network dependency); Claude API is an opt-in upgrade on the same grounded inputs</li>
+        <li>Every sentence in the brief maps back to a computed input — fully auditable</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 4 — SYSTEM ARCHITECTURE (corrected)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>System Architecture</h2>
+  <p class="section-note">Three-service design with JWT/RBAC gateway, synchronous ML pipeline, and role-based analyst console</p>
+
+  <!-- Client layer -->
+  <div class="card card-cyan" style="margin-bottom:16px;padding:12px 20px;">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <strong style="color:var(--cyan);font-size:12px;white-space:nowrap;">CLIENT LAYER</strong>
+      <span style="font-size:12.5px;color:var(--muted);">React SPA (Vite · Tailwind dark theme · React Flow · Recharts · Framer Motion) &nbsp;|&nbsp; Role-based views: Analyst, Risk Manager, Admin &nbsp;|&nbsp; Skeleton loaders · one-click PDF export</span>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="arrow" style="margin-bottom:10px;">↕ HTTPS / JSON · Bearer access token</div>
+
+  <!-- Gateway -->
+  <div class="card card-green" style="margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <strong style="color:var(--green);">API GATEWAY (Node.js + Express)</strong>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+      <div class="arch-box"><div class="arch-title" style="color:var(--green);">JWT RS256</div><div style="font-size:11px;color:var(--muted);">Auth + RBAC — per-route permission enforcement</div></div>
+      <div class="arch-box"><div class="arch-title" style="color:var(--green);">Rate Limiter</div><div style="font-size:11px;color:var(--muted);">Per-IP global; stricter auth limit</div></div>
+      <div class="arch-box"><div class="arch-title" style="color:var(--green);">Zod Validation</div><div style="font-size:11px;color:var(--muted);">Schema validation on all inputs</div></div>
+      <div class="arch-box"><div class="arch-title" style="color:var(--green);">Audit Log</div><div style="font-size:11px;color:var(--muted);">Immutable — every analyze and report action</div></div>
+      <div class="arch-box"><div class="arch-title" style="color:var(--green);">Request Router</div><div style="font-size:11px;color:var(--muted);">5 route groups; Helmet security headers</div></div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="arrow" style="margin-bottom:10px;">↕ HTTP / JSON — trusted internal call</div>
+
+  <!-- Services row -->
+  <div style="display:grid;grid-template-columns:1.1fr 1.5fr 1.1fr 1fr;gap:14px;margin-bottom:12px;">
+    <div class="card card-cyan" style="padding:14px 14px;">
+      <div class="arch-title" style="color:var(--cyan);">Transaction Service</div>
+      <ul style="margin-top:8px;">
+        <li>Zod schema validation</li>
+        <li>ID assignment</li>
+        <li>In-memory persist → score → alert</li>
+        <li>Synchronous scoring path</li>
+      </ul>
+    </div>
+    <div class="card card-amber" style="padding:14px 14px;">
+      <div class="arch-title" style="color:var(--amber);">ML Scoring Service (FastAPI :8000)</div>
+      <ul style="margin-top:8px;">
+        <li>XGBoost + Isotonic calibration</li>
+        <li>SHAP TreeExplainer (exact per-prediction)</li>
+        <li>Isolation Forest anomaly score</li>
+        <li>NetworkX graph analytics</li>
+        <li>RapidFuzz / OFAC sanctions screening</li>
+        <li>Composite score: 4-signal weighted blend</li>
+      </ul>
+    </div>
+    <div class="card card-rose" style="padding:14px 14px;">
+      <div class="arch-title" style="color:var(--rose);">Alert Service</div>
+      <ul style="margin-top:8px;">
+        <li>Alert state (open/review/closed)</li>
+        <li>Severity band from composite score</li>
+        <li>Linked to assessment record</li>
+        <li>Filterable, sortable queue</li>
+      </ul>
+    </div>
+    <div class="card card-blue" style="padding:14px 14px;">
+      <div class="arch-title" style="color:var(--blue);">Report Service</div>
+      <ul style="margin-top:8px;">
+        <li>Immutable point-in-time snapshot</li>
+        <li>Grounded investigation brief</li>
+        <li>Model version stamped</li>
+        <li>PDF via browser print</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Data layer -->
+  <div class="card" style="padding:12px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <strong style="color:var(--muted);font-size:12px;white-space:nowrap;">DATA LAYER</strong>
+    <span style="font-size:11.5px;color:var(--muted);">In-memory store · MongoDB-ready interface (swap-in is one driver change) &nbsp;|&nbsp; Collections: users · transactions · assessments · alerts · auditLogs · reports &nbsp;|&nbsp; ML artifacts: classifier · calibrator · anomaly · SHAP explainer (joblib) · model_metadata.json · sanctions_index.json · country_risk.json</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 5 — TECHNOLOGY STACK (corrected)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Technology Stack</h2>
+  <p class="section-note">Every component selected for correctness, explainability and auditability</p>
+
+  <div class="grid-5">
+    <!-- Frontend -->
+    <div class="card card-cyan">
+      <div class="badge badge-cyan" style="margin-bottom:12px;display:inline-block;">Frontend</div>
+      <ul>
+        <li>React 18 with Vite</li>
+        <li>Tailwind CSS — semantic-token dark/light theme</li>
+        <li>React Flow — transaction network graph</li>
+        <li>Recharts — SHAP waterfall, score gauge</li>
+        <li>Framer Motion — page transitions, skeleton loaders</li>
+        <li>Role-based views: Analyst / Risk Manager / Admin</li>
+        <li>One-click PDF via browser print</li>
+      </ul>
+    </div>
+
+    <!-- API Gateway -->
+    <div class="card card-green">
+      <div class="badge badge-green" style="margin-bottom:12px;display:inline-block;">API Gateway</div>
+      <ul>
+        <li>Node.js 20 with Express</li>
+        <li>JWT RS256 — 15 min access + single-use refresh rotation</li>
+        <li>RBAC middleware — per-route permission</li>
+        <li>Helmet.js security headers</li>
+        <li>Per-IP rate limiting (global + stricter auth)</li>
+        <li>Zod input validation on all endpoints</li>
+        <li>bcrypt password hashing</li>
+        <li>Immutable audit log writer</li>
+      </ul>
+    </div>
+
+    <!-- ML Service -->
+    <div class="card card-amber">
+      <div class="badge badge-amber" style="margin-bottom:12px;display:inline-block;">ML Service</div>
+      <ul>
+        <li>Python 3.12 + FastAPI</li>
+        <li>XGBoost fraud classifier</li>
+        <li>Isotonic Regression calibration</li>
+        <li>SHAP TreeExplainer (exact attributions)</li>
+        <li>Isolation Forest anomaly detection</li>
+        <li>NetworkX graph analytics</li>
+        <li>RapidFuzz token_set_ratio sanctions matching</li>
+        <li>FATF country-risk signal</li>
+        <li>imbalanced-learn (RandomUnderSampler + SMOTE)</li>
+      </ul>
+    </div>
+
+    <!-- Data Layer -->
+    <div class="card card-rose">
+      <div class="badge badge-rose" style="margin-bottom:12px;display:inline-block;">Data Layer</div>
+      <ul>
+        <li>In-memory store — MongoDB-shaped interface</li>
+        <li>6 collections: users, transactions, assessments, alerts, auditLogs, reports</li>
+        <li>ML artifacts: joblib + JSON (auto-generated by training script)</li>
+        <li><strong style="color:var(--fg)">PaySim</strong> — 6.3M rows, primary classifier training</li>
+        <li><strong style="color:var(--fg)">OFAC SDN list</strong> — ~19k entities, ~20k aliases</li>
+        <li><strong style="color:var(--fg)">FATF</strong> — 29 high-risk jurisdiction scores</li>
+        <li>MongoDB swap-in: one driver change, no route changes</li>
+      </ul>
+    </div>
+
+    <!-- LLM & Reports -->
+    <div class="card card-blue">
+      <div class="badge badge-blue" style="margin-bottom:12px;display:inline-block;">Briefs & Reports</div>
+      <ul>
+        <li>Deterministic narrator by default — reproducible, no network</li>
+        <li>Claude API opt-in — same grounded inputs, richer prose</li>
+        <li>Strictly grounded: narrator sees only computed evidence</li>
+        <li>Structured brief: risk summary, SHAP factors, graph, sanctions, recommended action</li>
+        <li>Recommended action computed per-transaction (not a band lookup)</li>
+        <li>Immutable point-in-time report snapshots</li>
+        <li>PDF export via browser print (vector text)</li>
+        <li>Every call logged in the audit trail</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 6 — DATASETS AND TRAINING (corrected)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Datasets and Training Approach</h2>
+  <p class="section-note">Three data sources, each mapped to a specific role with documented rationale and measured results</p>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <!-- PaySim -->
+    <div class="card card-cyan">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div class="badge badge-cyan" style="font-size:13px;padding:6px 18px;">PaySim</div>
+      </div>
+      <p style="font-size:11px;color:var(--cyan);margin-bottom:8px;font-style:italic;">6,362,620 transactions · 0.129% fraud rate</p>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;"><strong style="color:var(--fg)">Role:</strong> Primary training data for <em>both</em> the XGBoost fraud classifier and the Isolation Forest anomaly model (legitimate subset only).</p>
+      <p style="font-size:12.5px;color:var(--muted);">Mobile money simulation with CASH_IN, CASH_OUT, TRANSFER, PAYMENT types that closely mirror UPI and NEFT patterns. Also used to build the sender-to-receiver transaction graph for NetworkX analytics.</p>
+    </div>
+
+    <!-- OFAC SDN -->
+    <div class="card card-rose">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div class="badge badge-rose" style="font-size:13px;padding:6px 18px;">OFAC SDN List</div>
+      </div>
+      <p style="font-size:11px;color:var(--rose);margin-bottom:8px;font-style:italic;">~19,073 entities · ~20,292 aliases</p>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;"><strong style="color:var(--fg)">Role:</strong> Primary sanctions screening source. Ingested from the live US Treasury feed (SDN + ALT aliases + ADD addresses).</p>
+      <p style="font-size:12.5px;color:var(--muted);">Screened using <strong style="color:var(--fg)">RapidFuzz <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:3px;">token_set_ratio</code></strong> (case-insensitive, order-independent) above 88% threshold. The matched alias, score and program are always returned for audit defensibility.</p>
+    </div>
+
+    <!-- FATF -->
+    <div class="card" style="border-color:#6366f1;">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div class="badge" style="background:rgba(99,102,241,.18);color:#818cf8;font-size:13px;padding:6px 18px;">FATF Jurisdictions</div>
+      </div>
+      <p style="font-size:11px;color:#818cf8;margin-bottom:8px;font-style:italic;">29 high-risk and increased-monitoring jurisdictions</p>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;"><strong style="color:var(--fg)">Role:</strong> Country-risk signal feeding the sanctions component of the composite score.</p>
+      <p style="font-size:12.5px;color:var(--muted);">Countries on the FATF high-risk list contribute a country-risk adjustment when the counterparty's country matches. Encoded in <code style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:3px;">country_risk.json</code>.</p>
+    </div>
+  </div>
+
+  <!-- Measured results -->
+  <div class="card" style="padding:18px 22px;">
+    <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;">Measured Results — held-out time-split test fold (true 0.129% prior)</div>
+    <table>
+      <thead>
+        <tr><th>Model</th><th>ROC-AUC</th><th>PR-AUC</th><th>Precision</th><th>Recall</th><th>Brier Score</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td>XGBoost (calibrated) ← <em>DarkSentinel</em></td>
+          <td>0.997</td><td>0.9935</td><td>1.000</td><td>0.9935</td><td>2.8×10⁻⁵</td>
+          <td style="color:var(--muted);">Calibrated probability is meaningful; 3× better Brier than RF</td>
+        </tr>
+        <tr>
+          <td>Random Forest (baseline)</td>
+          <td>—</td><td>1.000</td><td>0.996</td><td>0.9995</td><td>3.2×10⁻⁵</td>
+          <td style="color:var(--muted);">Honest like-for-like comparison on same features</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.6;"><strong style="color:var(--amber);">On "0.99 looks too good":</strong> PaySim is a known, highly-separable dataset — fraud is mechanically tied to balance-reconciliation features; 0.99+ PR-AUC is the documented benchmark norm. Leakage guards: <code>isFlaggedFraud</code> excluded, split is chronological (by PaySim <code>step</code>), SHAP importance is spread across legitimate balance and amount features — not a single label-like column.</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 7 — MEASURED IMPACT (replaces Expected Impact)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Measured Impact</h2>
+  <p class="section-note">Training and evaluation are complete — all numbers below are measured, not projected</p>
+
+  <!-- Metric row -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;">
+    <div class="metric-block">
+      <div class="metric-val">0.9935</div>
+      <div class="metric-label">PR-AUC (XGBoost calibrated)</div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-val">0.997</div>
+      <div class="metric-label">ROC-AUC</div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-val">2.8×10⁻⁵</div>
+      <div class="metric-label">Brier Score (3× better than RF baseline)</div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-val">~19k</div>
+      <div class="metric-label">Real OFAC entities screened per transaction</div>
+    </div>
+    <div class="metric-block">
+      <div class="metric-val">36</div>
+      <div class="metric-label">Seeded alerts — all scored by live ML service</div>
+    </div>
+  </div>
+
+  <!-- Impact cards -->
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="card card-cyan">
+      <div class="card-header">
+        <span class="badge badge-cyan">Time</span>
+        <span class="card-title">Faster Investigation</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">Every alert arrives pre-built with a SHAP attribution waterfall, a transaction network graph, a live OFAC sanctions check, and a recommended action computed from this transaction's specific evidence — not a generic band lookup. Analysts start with a complete dossier, not a blank page.</p>
+    </div>
+    <div class="card card-green">
+      <div class="card-header">
+        <span class="badge badge-green">Filter</span>
+        <span class="card-title">Calibrated, Not Just Ranked</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">Isotonic calibration means the score "87% fraud probability" actually means 87%. Analysts can set a defensible threshold rather than guessing from a raw ML score. The Brier score of 2.8×10⁻⁵ — three times better than the Random Forest baseline — quantifies the calibration gain.</p>
+    </div>
+    <div class="card card-amber">
+      <div class="card-header">
+        <span class="badge badge-amber">Scale</span>
+        <span class="card-title">No Hardcoded Values</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">Every number in the UI is computed: composite scores, SHAP values, graph centrality, mule flags, sanctions similarity, and the investigation brief. The 36 seeded demo alerts span 7 days of backdated timestamps and four scenario types (payments, mule funnels, drain frauds, OFAC name matches), all scored by the live model.</p>
+    </div>
+  </div>
+
+  <!-- Comparison table -->
+  <div class="card" style="padding:16px 20px;">
+    <div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;">Model Comparison (identical feature set · same test fold)</div>
+    <table>
+      <thead>
+        <tr><th>System</th><th>Detection Method</th><th>Explainability</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Static rule-based threshold</td><td>Fixed rules per field</td><td>Rule name only</td><td style="color:#6a7fa0;">Reference baseline — no calibrated probability, no attribution</td></tr>
+        <tr><td>Random Forest (baseline)</td><td>Ensemble on same 25 features</td><td>Feature importance (global, not per-case)</td><td style="color:var(--muted);">PR-AUC 1.000, but Brier 3.2×10⁻⁵ — less calibrated; no per-prediction SHAP</td></tr>
+        <tr class="highlight"><td>DarkSentinel — XGBoost (calibrated)</td><td>Calibrated probability + anomaly + graph + sanctions</td><td>Per-transaction SHAP waterfall + grounded brief</td><td>PR-AUC 0.9935, Brier 2.8×10⁻⁵ — best calibration; full four-signal composite</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 8 — PROJECT STATUS (replaces Roadmap)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide">
+  <h2>Project Status</h2>
+  <p class="section-note">What is built and running, what was scoped out, and what remains on the production roadmap</p>
+
+  <div class="grid-5">
+    <!-- Phase 1 -->
+    <div class="phase-card card card-cyan">
+      <div class="badge badge-cyan" style="margin-bottom:6px;">Phase 1</div>
+      <div class="card-title" style="margin-bottom:4px;">Data &amp; Model Foundation</div>
+      <span class="phase-status done">✓ COMPLETE</span>
+      <ul style="margin-top:6px;">
+        <li>6.3M-row PaySim loaded and explored</li>
+        <li>25-feature engineering pipeline</li>
+        <li>Chronological 70/15/15 time-split</li>
+        <li>RandomUnderSampler + SMOTE (train fold only)</li>
+        <li>XGBoost + Isotonic calibration</li>
+        <li>Isolation Forest on legitimate traffic</li>
+        <li>SHAP TreeExplainer bound and persisted</li>
+        <li>Random Forest baseline for honest comparison</li>
+      </ul>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-card card card-amber">
+      <div class="badge badge-amber" style="margin-bottom:6px;">Phase 2</div>
+      <div class="card-title" style="margin-bottom:4px;">Core Services</div>
+      <span class="phase-status partial">⚠ PARTIAL</span>
+      <ul style="margin-top:6px;">
+        <li style="color:var(--green);">✓ Monorepo scaffolded</li>
+        <li style="color:var(--green);">✓ Transaction service (sync)</li>
+        <li style="color:var(--green);">✓ ML scoring service</li>
+        <li style="color:var(--green);">✓ Alert service (state machine)</li>
+        <li style="color:#ff6b8a;">✗ Async scoring queue (roadmap)</li>
+        <li style="color:#ff6b8a;">✗ MongoDB (in-memory store used)</li>
+        <li style="color:#ff6b8a;">✗ Docker / CI pipeline (roadmap)</li>
+      </ul>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-card card card-amber">
+      <div class="badge badge-amber" style="margin-bottom:6px;">Phase 3</div>
+      <div class="card-title" style="margin-bottom:4px;">Graph &amp; Sanctions</div>
+      <span class="phase-status partial">⚠ PARTIAL</span>
+      <ul style="margin-top:6px;">
+        <li style="color:var(--green);">✓ NetworkX directed graph</li>
+        <li style="color:var(--green);">✓ Degree, betweenness, eigenvector</li>
+        <li style="color:var(--green);">✓ Mule detection (fan-in/out)</li>
+        <li style="color:var(--green);">✓ Shortest path to sanctioned</li>
+        <li style="color:var(--green);">✓ Risk propagation</li>
+        <li style="color:var(--green);">✓ OFAC SDN ingested (19k entities)</li>
+        <li style="color:var(--green);">✓ RapidFuzz screening</li>
+        <li style="color:var(--green);">✓ FATF country-risk signal</li>
+        <li style="color:#ff6b8a;">✗ DBSCAN community clustering (roadmap)</li>
+        <li style="color:#ff6b8a;">✗ UN Consolidated list (roadmap)</li>
+      </ul>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase-card card card-cyan">
+      <div class="badge badge-cyan" style="margin-bottom:6px;">Phase 4</div>
+      <div class="card-title" style="margin-bottom:4px;">Gateway &amp; Dashboard</div>
+      <span class="phase-status done">✓ COMPLETE</span>
+      <ul style="margin-top:6px;">
+        <li>JWT RS256 + RBAC gateway</li>
+        <li>Per-IP rate limiting</li>
+        <li>Helmet + Zod + bcrypt</li>
+        <li>Immutable audit log</li>
+        <li>All three role dashboards</li>
+        <li>SHAP waterfall chart</li>
+        <li>React Flow network graph</li>
+        <li>Score gauge (four-signal breakdown)</li>
+        <li>Dark theme + light toggle</li>
+        <li>Skeleton loaders + Framer Motion</li>
+      </ul>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase-card card card-cyan">
+      <div class="badge badge-cyan" style="margin-bottom:6px;">Phase 5</div>
+      <div class="card-title" style="margin-bottom:4px;">Briefs &amp; Demo</div>
+      <span class="phase-status done">✓ COMPLETE</span>
+      <ul style="margin-top:6px;">
+        <li>Deterministic narrator (offline)</li>
+        <li>Claude API opt-in integration</li>
+        <li>Anti-hallucination design (evidence-only input)</li>
+        <li>Per-transaction recommended action</li>
+        <li>Immutable investigation reports</li>
+        <li>PDF export (browser print)</li>
+        <li>36 real ML-scored seeded alerts</li>
+        <li>VIDEO_DEMO.md 5-min script</li>
+        <li>documentation.md (comprehensive)</li>
+        <li>ARCHITECTURE.md · DATA_PROVENANCE.md</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="notice notice-amber" style="margin-top:16px;margin-bottom:0;">
+    <strong>Production roadmap (interfaces designed, not yet wired):</strong> MongoDB swap-in (Mongo-shaped interface ready) · async scoring queue (seams in place) · WebSocket push alerts · DBSCAN community clustering · UN sanctions ingestion · per-tenant isolation · Docker / CI · Optuna hyperparameter tuning.
+  </div>
+</div>
+
+</body>
+</html>
