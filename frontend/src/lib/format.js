@@ -24,5 +24,19 @@ export function fmtDateTime(iso) {
   });
 }
 
+/** Compact relative time, e.g. "3m", "5h", "2d". Falls back to a date past a week. */
+export function fmtRelative(iso) {
+  if (!iso) return '—';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.round(diffMs / 60_000);
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.round(hr / 24);
+  if (day <= 7) return `${day}d ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 export const titleCase = (s) =>
   (s ?? '').replace(/[_-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());

@@ -3,8 +3,28 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /* Dark is the default theme. The .light class on <html> flips the variables. */
+  :root,
+  .dark {
+    color-scheme: dark;
+    --base: 9 11 16; /* app background */
+    --surface: 17 20 27; /* cards */
+    --elevated: 25 30 39; /* hover / raised */
+    --line: 33 40 52; /* borders */
+    --fg: 233 236 242; /* primary text */
+    --muted: 148 159 177; /* secondary text */
+    --faint: 99 109 124; /* tertiary text */
+  }
+
+  .light {
     color-scheme: light;
+    --base: 247 248 250;
+    --surface: 255 255 255;
+    --elevated: 243 245 248;
+    --line: 228 231 237;
+    --fg: 17 24 39;
+    --muted: 100 109 124;
+    --faint: 148 159 177;
   }
 
   html,
@@ -14,26 +34,70 @@
   }
 
   body {
-    @apply bg-neutral-50 text-neutral-900 antialiased;
+    @apply bg-base text-fg antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  /* Consistent, subtle focus ring across interactive elements for accessibility. */
   *:focus-visible {
-    @apply outline-none ring-2 ring-accent-500/40 ring-offset-1 ring-offset-white;
+    @apply outline-none ring-2 ring-accent-500/40 ring-offset-1 ring-offset-base;
+  }
+
+  /* Calm, theme-aware scrollbars. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full;
+    background: rgb(var(--line));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--faint));
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
 @layer components {
-  /* Reusable surface primitive used by Card and panels. */
   .surface {
-    @apply rounded-lg border border-neutral-200 bg-white shadow-card;
+    @apply rounded-xl border border-line bg-surface shadow-card;
   }
 
-  /* Tabular numerals for any column of figures. */
   .tnum {
     font-variant-numeric: tabular-nums;
   }
+
+  /* Skeleton loading shimmer — a subtle moving highlight over a muted block. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-elevated;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--fg) / 0.06),
+      transparent
+    );
+  }
+}
+
+/* React Flow controls themed to match the console. */
+.ds-flow .react-flow__controls {
+  @apply overflow-hidden rounded-lg border border-line shadow-card;
+}
+.ds-flow .react-flow__controls-button {
+  background: rgb(var(--surface));
+  border-bottom: 1px solid rgb(var(--line));
+  color: rgb(var(--muted));
+}
+.ds-flow .react-flow__controls-button:hover {
+  background: rgb(var(--elevated));
+}
+.ds-flow .react-flow__controls-button svg {
+  fill: currentColor;
 }
 
 /* Print styles for the investigation report (browser print-to-PDF). */
@@ -41,7 +105,9 @@
   .no-print {
     display: none !important;
   }
-  body {
-    @apply bg-white;
+  /* Reports always print on white for a clean document regardless of theme. */
+  .print-surface {
+    background: #ffffff !important;
+    color: #111827 !important;
   }
 }

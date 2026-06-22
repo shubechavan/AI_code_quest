@@ -10,7 +10,7 @@ export function RiskBadge({ band, score }) {
     >
       <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
       {s.label}
-      {score != null && <span className="tnum opacity-70">· {score}</span>}
+      {score != null && <span className="tnum opacity-80">· {score}</span>}
     </span>
   );
 }

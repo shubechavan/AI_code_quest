@@ -28,12 +28,59 @@ from dataclasses import dataclass
 
 from darksentinel.models.scoring import RiskAssessment
 
-RECOMMENDED_ACTIONS = {
-    "critical": "Escalate immediately; freeze pending review and prepare a SAR.",
-    "high": "Assign for priority manual review within SLA; hold high-value legs.",
-    "medium": "Queue for standard review; monitor the account for repeat patterns.",
-    "low": "No action required; retain for audit trail.",
+# Base triage urgency keyed on the *computed* risk band. This is the SOP starting point;
+# `recommend_action` below extends it with steps derived from the actual evidence on the
+# transaction (sanctions match, mule structure, sanctioned-path proximity), so the final
+# recommendation is computed per-transaction rather than a fixed lookup.
+_BASE_URGENCY = {
+    "critical": "Escalate to a senior investigator immediately and place a temporary hold "
+                "on the account pending review.",
+    "high": "Assign for priority manual review within SLA and hold high-value legs.",
+    "medium": "Queue for standard review and monitor the account for repeat patterns.",
+    "low": "No action required; retain for the audit trail.",
 }
+
+
+def recommend_action(a: RiskAssessment) -> str:
+    """Assemble a recommended action from the transaction's computed signals.
+
+    Unlike a static band->text lookup, this reads the real evidence on the assessment —
+    the sanctions risk, the graph structure, and the model probability — and only includes
+    a step when the corresponding signal is actually present. The output therefore differs
+    transaction-to-transaction and is fully traceable to computed inputs.
+    """
+    steps: list[str] = [_BASE_URGENCY.get(a.risk_band, _BASE_URGENCY["low"])]
+
+    if a.sanctions_risk > 0:
+        steps.append(
+            "Confirm the sanctions name match against the official list; if validated, "
+            "block the transaction and prepare a SAR / blocking report."
+        )
+
+    g = a.graph_signals
+    if g is not None:
+        if g.is_mule_pattern:
+            steps.append(
+                f"Expand the case to the connected accounts in the receive-and-forward "
+                f"chain (fan-in {g.fan_in}, fan-out {g.fan_out})."
+            )
+        if g.distance_to_sanctioned is not None:
+            steps.append(
+                f"Trace the {g.distance_to_sanctioned}-hop path to the sanctioned account "
+                f"and review the intermediaries."
+            )
+
+    # When the model is the dominant driver and nothing else corroborates, point the
+    # analyst at the specific feature that drove the score.
+    if a.sanctions_risk == 0 and (g is None or not g.is_mule_pattern):
+        top = next((f for f in a.contributing_factors if f["source"] == "model"), None)
+        if top and a.risk_band in ("high", "critical"):
+            steps.append(
+                f"Primary driver is '{top['label']}'; verify the account's balance history "
+                "and recent transfers."
+            )
+
+    return " ".join(steps)
 
 
 @dataclass
@@ -108,12 +155,13 @@ class DeterministicNarrator:
             contributing_factors=factors,
             network_concerns=network,
             sanctions_status=sanctions_summary,
-            recommended_action=RECOMMENDED_ACTIONS[band],
+            recommended_action=recommend_action(a),
             confidence_note=(
-                f"Score is calibrated (isotonic); the {a.supervised_probability:.0%} "
-                "probability reflects observed fraud frequency at this score level. "
-                "Every statement above maps to a computed SHAP attribution or graph "
-                "metric — no factor was introduced by the narrative layer."
+                f"Score produced by model {a.model_version}; the probability is isotonic-"
+                f"calibrated, so {a.supervised_probability:.0%} reflects observed fraud "
+                "frequency at this score level. Every statement above maps to a computed "
+                "SHAP attribution, graph metric, or sanctions match — no factor was "
+                "introduced by the narrative layer."
             ),
             generated_by=self.name,
         )

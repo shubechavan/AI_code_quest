@@ -21,6 +21,11 @@ ml-service/data/*.csv
 .env.local
 *.local
 
+# Cryptographic keys — auto-generated dev keys must never be committed
+*.pem
+*.key
+backend/keys/
+
 
 # Editor / OS
 .DS_Store

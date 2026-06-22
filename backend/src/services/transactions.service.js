@@ -25,11 +25,13 @@ export async function analyzeTransaction({
   sanctionedAccounts = [],
   user,
   mlClient,
+  detectedAt = null, // optional backdated timestamp (used when seeding historical alerts)
 }) {
   const stored = db.transactions.insert({
     ...transaction,
     tenantId: user.tenantId,
     submittedBy: user.id,
+    ...(detectedAt ? { createdAt: detectedAt } : {}),
   });
 
   const scored = await mlClient.score({
@@ -42,6 +44,7 @@ export async function analyzeTransaction({
   const assessment = db.assessments.insert({
     transactionId: stored._id,
     tenantId: user.tenantId,
+    ...(detectedAt ? { createdAt: detectedAt } : {}),
     modelVersion: scored.model_version,
     compositeScore: scored.composite_score,
     riskBand: scored.risk_band,
@@ -62,6 +65,7 @@ export async function analyzeTransaction({
       transactionId: stored._id,
       assessmentId: assessment._id,
       tenantId: user.tenantId,
+      ...(detectedAt ? { createdAt: detectedAt } : {}),
       riskBand: scored.risk_band,
       compositeScore: scored.composite_score,
       state: 'open', // open -> in_review -> resolved | escalated

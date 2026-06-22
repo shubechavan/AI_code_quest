@@ -1,6 +1,7 @@
 import { Card, CardBody, CardHeader } from '../components/ui/Card.jsx';
-import { ErrorState, LoadingState } from '../components/ui/States.jsx';
+import { ErrorState, SkeletonTable } from '../components/ui/States.jsx';
 import { Topbar } from '../components/layout/Topbar.jsx';
+import { PageTransition } from '../components/ui/motion.jsx';
 import { api } from '../lib/api.js';
 import { titleCase } from '../lib/format.js';
 import { useAsync } from '../lib/useAsync.js';
@@ -13,18 +14,18 @@ export function Admin() {
     <>
       <Topbar title="Administration" subtitle="User directory and access" />
       <main className="flex-1 overflow-y-auto p-6">
-        <div className="mx-auto max-w-3xl">
+        <PageTransition className="mx-auto max-w-3xl">
           <Card>
             <CardHeader title="Users" description="Console accounts in this tenant" />
             <CardBody className="p-0">
               {loading ? (
-                <LoadingState />
+                <SkeletonTable rows={3} />
               ) : error ? (
                 <ErrorState error={error} onRetry={reload} />
               ) : (
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-neutral-200 text-left text-xs font-medium text-neutral-500">
+                    <tr className="border-b border-line text-left text-xs font-medium text-muted">
                       <th className="px-5 py-2.5">Name</th>
                       <th className="px-5 py-2.5">Email</th>
                       <th className="px-5 py-2.5">Role</th>
@@ -32,13 +33,11 @@ export function Admin() {
                   </thead>
                   <tbody>
                     {data.results.map((u) => (
-                      <tr key={u.id} className="border-b border-neutral-100 last:border-0">
-                        <td className="px-5 py-3 font-medium text-neutral-900">{u.name}</td>
-                        <td className="px-5 py-3 text-neutral-600">{u.email}</td>
+                      <tr key={u.id} className="border-b border-line/60 last:border-0">
+                        <td className="px-5 py-3 font-medium text-fg">{u.name}</td>
+                        <td className="px-5 py-3 text-muted">{u.email}</td>
                         <td className="px-5 py-3">
-                          <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
-                            {titleCase(u.role)}
-                          </span>
+                          <span className="rounded bg-elevated px-2 py-0.5 text-xs font-medium text-muted">{titleCase(u.role)}</span>
                         </td>
                       </tr>
                     ))}
@@ -47,7 +46,7 @@ export function Admin() {
               )}
             </CardBody>
           </Card>
-        </div>
+        </PageTransition>
       </main>
     </>
   );

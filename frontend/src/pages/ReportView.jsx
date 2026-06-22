@@ -27,13 +27,13 @@ export function ReportView() {
   const b = s.brief;
 
   return (
-    <div className="min-h-screen bg-neutral-100 py-8 print:bg-white print:py-0">
+    <div className="min-h-screen bg-base py-8 print:bg-white print:py-0">
       <div className="no-print mx-auto mb-4 flex max-w-3xl items-center justify-between px-4">
-        <Link to="/reports" className="text-sm text-neutral-500 hover:text-neutral-800">← All reports</Link>
+        <Link to="/reports" className="text-sm text-muted hover:text-fg">← All reports</Link>
         <Button onClick={() => window.print()}>Export PDF</Button>
       </div>
 
-      <article className="mx-auto max-w-3xl bg-white p-10 shadow-card print:max-w-none print:shadow-none">
+      <article className="print-surface mx-auto max-w-3xl bg-white p-10 shadow-elevated print:max-w-none print:shadow-none">
         {/* Letterhead */}
         <header className="flex items-start justify-between border-b border-neutral-200 pb-5">
           <div className="flex items-center gap-2.5">

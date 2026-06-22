@@ -20,14 +20,14 @@ export function Sidebar() {
   const items = NAV.filter((i) => hasPermission(i.perm));
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-neutral-200 bg-white">
-      <div className="flex h-14 items-center gap-2 border-b border-neutral-200 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-neutral-900 text-xs font-bold text-white">
+    <aside className="flex w-60 shrink-0 flex-col border-r border-line bg-surface">
+      <div className="flex h-14 items-center gap-2.5 border-b border-line px-5">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent-500 to-accent-700 text-xs font-bold text-white">
           DS
         </div>
         <div className="leading-tight">
-          <div className="text-sm font-semibold text-neutral-900">DarkSentinel</div>
-          <div className="text-[11px] text-neutral-500">Risk Intelligence</div>
+          <div className="text-sm font-semibold text-fg">DarkSentinel</div>
+          <div className="text-[11px] text-muted">Risk Intelligence</div>
         </div>
       </div>
 
@@ -38,10 +38,10 @@ export function Sidebar() {
             to={to}
             end={end}
             className={({ isActive }) =>
-              `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-accent-50 text-accent-700'
-                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
+                  ? 'bg-accent-500/10 text-accent-400'
+                  : 'text-muted hover:bg-elevated hover:text-fg'
               }`
             }
           >
@@ -50,10 +50,6 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
-      <div className="border-t border-neutral-200 p-3 text-[11px] text-neutral-400">
-        Synthetic data · not for production use
-      </div>
     </aside>
   );
 }

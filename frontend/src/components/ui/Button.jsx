@@ -1,13 +1,14 @@
 /**
- * Button primitive with a small set of intentional variants. No gradients, one elevation.
+ * Button primitive with a small set of intentional variants. One elevation, no gradients
+ * on secondary/ghost; the primary uses a subtle accent gradient for a touch of depth.
  */
 const VARIANTS = {
   primary:
-    'bg-accent-600 text-white hover:bg-accent-700 disabled:bg-accent-600/50',
+    'bg-accent-600 text-white hover:bg-accent-500 disabled:bg-accent-600/50 shadow-sm',
   secondary:
-    'bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-50 disabled:opacity-50',
-  ghost: 'text-neutral-600 hover:bg-neutral-100 disabled:opacity-50',
-  danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-600/50',
+    'bg-elevated text-fg border border-line hover:border-faint/50 disabled:opacity-50',
+  ghost: 'text-muted hover:bg-elevated hover:text-fg disabled:opacity-50',
+  danger: 'bg-rose-600 text-white hover:bg-rose-500 disabled:bg-rose-600/50',
 };
 
 const SIZES = {
@@ -26,7 +27,7 @@ export function Button({
 }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium
+      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium
         transition-colors disabled:cursor-not-allowed ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       disabled={loading || props.disabled}
       {...props}

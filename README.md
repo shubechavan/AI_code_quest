@@ -27,8 +27,11 @@ React (analyst UI)
 | `ml-service/` | Python, FastAPI, XGBoost, SHAP | Risk scoring, explainability, graph analytics, narrative |
 | `backend/`    | Node.js, Express               | Auth (JWT/RBAC), audit log, transaction gateway          |
 | `frontend/`   | React, Vite, Tailwind          | Analyst console (risk analysis, SHAP, graph)             |
-| `docs/`       | Markdown                       | Architecture decisions, API contracts, audit of brief    |
-| `datasets/`   | —                              | Data card; generator lives in `ml-service`               |
+| `docs/archive/` | Markdown                     | Detailed design notes (audit, DB, ML/LLM, API, roadmap)  |
+| `datasets/`   | —                              | Data card (PaySim placement, sanctions ingestion)        |
+
+Top-level docs: [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`CHANGE.md`](CHANGE.md) ·
+[`VIDEO_DEMO.md`](VIDEO_DEMO.md) · [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md).
 
 ## Quick start
 
@@ -51,7 +54,7 @@ npm install && npm run dev           # :5173
 ```
 
 Default demo credentials and seeded scenarios are documented in
-[`docs/05-demo.md`](docs/05-demo.md).
+[`VIDEO_DEMO.md`](VIDEO_DEMO.md) and [`docs/archive/05-demo.md`](docs/archive/05-demo.md).
 
 ## Design principles
 
@@ -65,5 +68,5 @@ Default demo credentials and seeded scenarios are documented in
 3. **Auditability first.** Every score carries the model version, feature vector, and
    attribution that produced it.
 
-See [`docs/00-ppt-audit.md`](docs/00-ppt-audit.md) for the engineering audit of the
+See [`docs/archive/00-ppt-audit.md`](docs/archive/00-ppt-audit.md) for the engineering audit of the
 original product brief and the rationale behind what we built versus what we cut.

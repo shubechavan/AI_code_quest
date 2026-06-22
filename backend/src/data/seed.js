@@ -1,23 +1,18 @@
 /**
- * Idempotent demo seed.
+ * Idempotent seed.
  *
- * Creates the three persona users and, if the ML service is reachable, scores the curated
- * demo scenarios so a fresh boot lands on a populated, realistic queue. If the ML service
- * is down, user seeding still succeeds and the queue fills in once scoring is available —
- * boot never hard-fails on an unavailable dependency.
- *
- * Credentials are documented in docs/05-demo.md. These are demo accounts for a local
- * environment only.
+ * Creates the three persona users and, if the ML service is reachable, scores a generated
+ * set of realistic transactions so a fresh boot lands on a populated, working queue. Every
+ * transaction is scored through the real ML service — the seed only controls the input mix
+ * and timestamps, never the resulting scores. If the ML service is down, user seeding still
+ * succeeds and the queue fills in once scoring is available; boot never hard-fails.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { ROLES } from '../config/roles.js';
 import { db } from './store.js';
 import { hashPassword } from '../services/auth.service.js';
 import { mlClient } from '../services/mlClient.js';
 import { analyzeTransaction } from '../services/transactions.service.js';
+import { buildSeedTransactions } from './seedAlerts.js';
 
 const TENANT = 'tenant_demo';
 
@@ -26,12 +21,6 @@ const DEMO_USERS = [
   { email: 'manager@darksentinel.io', name: 'Daniel Okafor', role: ROLES.RISK_MANAGER, password: 'Manager#2026' },
   { email: 'admin@darksentinel.io', name: 'Sara Mendes', role: ROLES.ADMIN, password: 'Admin#2026' },
 ];
-
-function scenariosPath() {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  // backend/src/data -> repo root -> ml-service/data/demo_scenarios.json
-  return path.resolve(here, '../../../ml-service/data/demo_scenarios.json');
-}
 
 async function seedUsers() {
   for (const u of DEMO_USERS) {
@@ -47,34 +36,41 @@ async function seedUsers() {
   return db.users.findOne((u) => u.role === ROLES.ANALYST);
 }
 
-async function seedScenarios(analyst) {
-  const file = scenariosPath();
-  if (!fs.existsSync(file)) {
-    console.warn(`[seed] scenarios file not found (${file}); skipping queue seed.`);
-    return;
+async function waitForMl(attempts = 15, delayMs = 1000) {
+  for (let i = 0; i < attempts; i++) {
+    const health = await mlClient.health();
+    if (health.status === 'ok') return true;
+    await new Promise((r) => setTimeout(r, delayMs));
   }
-  const health = await mlClient.health();
-  if (health.status !== 'ok') {
-    console.warn('[seed] ML service not ready; queue will populate after analyze calls.');
-    return;
-  }
-  if (db.transactions.count() > 0) return; // already seeded
+  return false;
+}
 
-  const scenarios = JSON.parse(fs.readFileSync(file, 'utf8'));
-  for (const s of scenarios) {
+async function seedScenarios(analyst) {
+  if (db.transactions.count() > 0) return; // already seeded
+  const ready = await waitForMl();
+  if (!ready) {
+    console.warn('[seed] ML service not ready after wait; queue will populate on first analyze.');
+    return;
+  }
+
+  const specs = buildSeedTransactions();
+  let scored = 0;
+  for (const s of specs) {
     try {
       await analyzeTransaction({
         transaction: s.transaction,
-        graphEdges: s.graph_edges ?? [],
-        sanctionedAccounts: s.sanctioned_accounts ?? [],
+        graphEdges: s.graphEdges ?? [],
+        sanctionedAccounts: s.sanctionedAccounts ?? [],
+        detectedAt: s.detectedAt,
         user: { id: analyst._id, tenantId: TENANT },
         mlClient,
       });
+      scored += 1;
     } catch (err) {
-      console.warn(`[seed] could not score scenario ${s.id}: ${err.message}`);
+      console.warn(`[seed] could not score a seed transaction: ${err.message}`);
     }
   }
-  console.log(`[seed] seeded ${db.transactions.count()} demo transactions.`);
+  console.log(`[seed] scored ${scored} seed transactions through the ML service.`);
 }
 
 export async function seed() {
