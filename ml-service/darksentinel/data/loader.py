@@ -1,11 +1,7 @@
 """Training-data loader.
 
-Resolves the data source for training: the real PaySim CSV if it has been placed under
-`data/raw/paysim/`, otherwise the synthetic generator. Both yield an identical schema, so
-nothing downstream (feature engineering, training, serving) changes between them.
-
-Keeping this selection in one place means `train.py` is agnostic to whether it is running
-on the real 6.3M-row dataset or the synthetic stand-in.
+Resolves the training data source: the real PaySim CSV placed under `data/raw/paysim/`.
+Centralising this here keeps `train.py` agnostic to where the 6.3M-row dataset lives.
 """
 
 from __future__ import annotations
@@ -15,7 +11,6 @@ from pathlib import Path
 import pandas as pd
 
 from darksentinel import config
-from darksentinel.data import synthetic
 
 PAYSIM_DIR = config.DATA_DIR / "raw" / "paysim"
 
@@ -57,11 +52,18 @@ def load_paysim(path: Path) -> pd.DataFrame:
     return df
 
 
-def load_training_data(synthetic_rows: int = 120_000, seed: int = 42):
-    """Return (dataframe, source_label). Prefers real PaySim; falls back to synthetic."""
+def load_training_data():
+    """Return (dataframe, source_label) for the real PaySim CSV.
+
+    Raises a clear error if the dataset has not been placed on disk. PaySim is a ~493MB
+    Kaggle download and is not vendored in the repository.
+    """
     path = find_paysim_csv()
-    if path is not None:
-        df = load_paysim(path)
-        return df, f"paysim-real ({path.name})"
-    df = synthetic.generate(n_rows=synthetic_rows, seed=seed)
-    return df, "synthetic"
+    if path is None:
+        raise FileNotFoundError(
+            f"PaySim dataset not found under {PAYSIM_DIR}.\n"
+            "Download it from https://www.kaggle.com/datasets/ealaxi/paysim1 and place the "
+            f"CSV at {PAYSIM_DIR / 'paysim.csv'}, then re-run training."
+        )
+    df = load_paysim(path)
+    return df, f"paysim-real ({path.name})"

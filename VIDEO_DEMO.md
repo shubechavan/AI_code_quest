@@ -273,7 +273,7 @@ permissions · admin-only user provisioning · JWT RS256 enforced at the gateway
   near 0 or 1. Medium is genuinely rare; we show the real distribution.
 - *"What's not production-grade yet?"* — Persistence is in-memory behind a Mongo-shaped
   interface; async scoring queue and WebSocket push are designed but not wired; Docker/CI
-  not set up. See `docs/archive/07-transformation-roadmap.md`.
+  not set up. See the "What is and isn't production-grade" section of `documentation.md`.
 - *"Is Claude always running?"* — No. Default narrator is fully deterministic. Claude
   activates only when `ANTHROPIC_API_KEY` is set; it runs on the same grounded inputs
   either way.

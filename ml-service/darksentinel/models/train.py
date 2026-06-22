@@ -110,8 +110,7 @@ def _resample(X_train, y_train, seed: int):
     Crucially this is applied to the TRAINING fold only — the calibration and test folds keep
     the true 0.13% prior, so calibrated probabilities and reported metrics stay honest.
 
-    For the small synthetic dataset (~1.3% prevalence) plain SMOTE-to-balance is fine and is
-    what we fall back to.
+    For a less-imbalanced fold (>=1% prevalence) plain SMOTE-to-balance is sufficient.
     """
     n_minority = int(y_train.sum())
     if n_minority < 0.01 * len(y_train):  # severe imbalance (real PaySim)
@@ -123,10 +122,10 @@ def _resample(X_train, y_train, seed: int):
     return SMOTE(random_state=seed).fit_resample(X_train, y_train)
 
 
-def train(n_rows: int = 200_000, seed: int = config.RANDOM_SEED) -> dict:
+def train(seed: int = config.RANDOM_SEED) -> dict:
     t0 = time.time()
     print("[1/7] Loading training data...")
-    df, source = load_training_data(synthetic_rows=n_rows, seed=seed)
+    df, source = load_training_data()
     print(f"      source: {source} | {len(df):,} rows | fraud rate {df['isFraud'].mean():.4%}")
 
     print("[2/7] Time-based train/calibration/test split...")

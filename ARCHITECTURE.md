@@ -1,9 +1,9 @@
 # Architecture — DarkSentinel AI
 
 Explainable Financial Crime Intelligence Platform. This document is the current,
-consolidated architecture reference. Deeper design notes (the original brief audit,
-database schema, API contracts, ML internals, transformation roadmap) are retained under
-[`docs/archive/`](docs/archive/).
+consolidated architecture reference. See [`documentation.md`](documentation.md) for the
+single-page product overview and [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md) for the
+field-by-field source map.
 
 ## System overview
 
@@ -85,12 +85,11 @@ immutable audit log.
 
 ```
 darksentinel/
-├── ARCHITECTURE.md  CHANGE.md  VIDEO_DEMO.md  DATA_PROVENANCE.md  README.md
+├── README.md  documentation.md  ARCHITECTURE.md  VIDEO_DEMO.md  DATA_PROVENANCE.md
 ├── ml-service/      FastAPI · scoring, explainability, graph, sanctions, training
 ├── backend/         Express gateway · auth, RBAC, audit, orchestration
 ├── frontend/        React console · dark-default design system
-├── datasets/        data card (PaySim placement, sanctions ingestion)
-└── docs/archive/    detailed design notes (audit, DB, ML/LLM, API, roadmap)
+└── datasets/        data card (PaySim placement, sanctions ingestion)
 ```
 
 ## Frontend design system

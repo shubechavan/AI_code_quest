@@ -19,14 +19,14 @@ Interactive API docs: http://localhost:8000/docs
 ```
 darksentinel/
   config.py              paths, composite-score weights, risk bands, model version
-  data/synthetic.py      PaySim-schema generator with realistic fraud overlap
+  data/loader.py         real PaySim CSV loader (memory-efficient dtypes)
   features/engineering.py 25-feature pipeline shared by training and serving
   models/train.py        SMOTE + XGBoost + isotonic + Isolation Forest + RF baseline + SHAP
   models/scoring.py      composite scorer singleton (the serving path)
   graph/analytics.py     NetworkX centrality, mule detection, sanctioned-path search
   explain/shap_explainer.py  exact per-prediction attributions
   explain/narrative.py   deterministic | Claude grounded investigation brief
-  sanctions/screening.py Jaro-Winkler fuzzy name matching
+  sanctions/screening.py RapidFuzz token-set fuzzy name matching over live OFAC
   api/main.py            FastAPI app: /health /model /score
 ```
 
@@ -49,6 +49,7 @@ darksentinel/
 
 ## Notes
 
-- The model is trained on **synthetic** PaySim-schema data. Metrics describe this build on
-  a held-out time-split test fold, not production traffic — see `docs/03-ml-and-llm.md`.
+- The model is trained on the **real 6.3M-row PaySim dataset**. Metrics describe this build
+  on a held-out time-split test fold that retains the true class prior — see
+  [`../DATA_PROVENANCE.md`](../DATA_PROVENANCE.md).
 - SHAP ≥ 0.48 is required for XGBoost 3.x compatibility (`base_score` parsing).

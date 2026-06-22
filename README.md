@@ -27,10 +27,9 @@ React (analyst UI)
 | `ml-service/` | Python, FastAPI, XGBoost, SHAP | Risk scoring, explainability, graph analytics, narrative |
 | `backend/`    | Node.js, Express               | Auth (JWT/RBAC), audit log, transaction gateway          |
 | `frontend/`   | React, Vite, Tailwind          | Analyst console (risk analysis, SHAP, graph)             |
-| `docs/archive/` | Markdown                     | Detailed design notes (audit, DB, ML/LLM, API, roadmap)  |
 | `datasets/`   | —                              | Data card (PaySim placement, sanctions ingestion)        |
 
-Top-level docs: [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`CHANGE.md`](CHANGE.md) ·
+Top-level docs: [`documentation.md`](documentation.md) · [`ARCHITECTURE.md`](ARCHITECTURE.md) ·
 [`VIDEO_DEMO.md`](VIDEO_DEMO.md) · [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md).
 
 ## Quick start
@@ -41,7 +40,7 @@ Three terminals. See each service's `README.md` for detail.
 # 1. ML service — ingest real data, train, then serve
 cd ml-service
 python scripts/ingest_sanctions.py   # live OFAC SDN list (~19k entities)
-python scripts/train_model.py        # trains on real PaySim if present, else synthetic
+python scripts/train_model.py        # trains on the real PaySim dataset (see datasets/README.md)
 uvicorn darksentinel.api.main:app --port 8000
 
 # 2. API gateway
@@ -54,7 +53,7 @@ npm install && npm run dev           # :5173
 ```
 
 Default demo credentials and seeded scenarios are documented in
-[`VIDEO_DEMO.md`](VIDEO_DEMO.md) and [`docs/archive/05-demo.md`](docs/archive/05-demo.md).
+[`VIDEO_DEMO.md`](VIDEO_DEMO.md) and [`documentation.md`](documentation.md).
 
 ## Design principles
 
@@ -68,5 +67,5 @@ Default demo credentials and seeded scenarios are documented in
 3. **Auditability first.** Every score carries the model version, feature vector, and
    attribution that produced it.
 
-See [`docs/archive/00-ppt-audit.md`](docs/archive/00-ppt-audit.md) for the engineering audit of the
-original product brief and the rationale behind what we built versus what we cut.
+See [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md) for a field-by-field map of every value shown
+in the UI to the exact code that computes it.

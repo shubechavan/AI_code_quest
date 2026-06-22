@@ -79,7 +79,7 @@ export function ReportView() {
 
         <footer className="mt-8 border-t border-neutral-200 pt-4 text-xs leading-relaxed text-neutral-400">
           {b.confidence_note} This report is a point-in-time snapshot; re-scoring the
-          transaction does not alter it. Generated on synthetic data for evaluation.
+          transaction does not alter it.
         </footer>
       </article>
     </div>

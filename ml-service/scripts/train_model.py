@@ -1,9 +1,10 @@
 """Train and persist all model artifacts.
 
 Usage:
-    python scripts/train_model.py            # default 200k synthetic rows
-    python scripts/train_model.py --rows 50000
+    python scripts/train_model.py
+    python scripts/train_model.py --seed 7
 
+Requires the real PaySim CSV at `data/raw/paysim/*.csv` (see datasets/README.md).
 Run once before starting the service. Re-run to retrain (artifacts are overwritten and
 stamped with MODEL_VERSION).
 """
@@ -22,11 +23,9 @@ from darksentinel.models.train import train  # noqa: E402
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train DarkSentinel risk models.")
-    parser.add_argument("--rows", type=int, default=200_000,
-                        help="Number of synthetic transactions to generate.")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    train(n_rows=args.rows, seed=args.seed)
+    train(seed=args.seed)
 
 
 if __name__ == "__main__":

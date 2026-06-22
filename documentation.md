@@ -8,8 +8,8 @@ attributions, transaction-graph signals, and live sanctions screening. The model
 SHAP and the graph explain; the language layer only narrates.
 
 This is the single-page reference. For deeper material see
-[`ARCHITECTURE.md`](ARCHITECTURE.md), [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md),
-[`VIDEO_DEMO.md`](VIDEO_DEMO.md), [`CHANGE.md`](CHANGE.md), and [`docs/archive/`](docs/archive/).
+[`ARCHITECTURE.md`](ARCHITECTURE.md), [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md), and
+[`VIDEO_DEMO.md`](VIDEO_DEMO.md).
 
 ---
 
@@ -103,10 +103,10 @@ stateless. Full detail in [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ```
 darksentinel/
-├── documentation.md  ARCHITECTURE.md  CHANGE.md  VIDEO_DEMO.md  DATA_PROVENANCE.md  README.md
+├── documentation.md  ARCHITECTURE.md  VIDEO_DEMO.md  DATA_PROVENANCE.md  README.md
 ├── ml-service/                 # FastAPI: scoring, explainability, graph, sanctions, training
 │   ├── darksentinel/
-│   │   ├── data/               # loader (real PaySim) + synthetic fallback generator
+│   │   ├── data/               # PaySim loader (real CSV)
 │   │   ├── features/           # 25-feature pipeline (shared train/serve)
 │   │   ├── models/             # train.py, scoring.py (composite)
 │   │   ├── graph/              # NetworkX analytics
@@ -118,8 +118,7 @@ darksentinel/
 │   └── src/{config,middleware,services,routes,data}/
 ├── frontend/                   # React console
 │   └── src/{lib,context,components,pages}/
-├── datasets/                   # data card (PaySim placement)
-└── docs/archive/               # detailed design notes
+└── datasets/                   # data card (PaySim placement)
 ```
 
 ---
@@ -129,8 +128,8 @@ darksentinel/
 ### Prerequisites
 - Python 3.12+ and Node.js 20+
 - Outbound internet for the live OFAC download (falls back to a sample offline)
-- *(Optional)* the real PaySim CSV at `ml-service/data/raw/paysim/*.csv` — without it,
-  training uses a schema-identical synthetic generator
+- The real PaySim CSV at `ml-service/data/raw/paysim/*.csv` (Kaggle download, ~493MB,
+  gitignored) — required for training; see [`datasets/README.md`](datasets/README.md)
 
 ### Run (three terminals)
 
@@ -139,7 +138,7 @@ darksentinel/
 cd ml-service
 pip install -r requirements.txt
 python scripts/ingest_sanctions.py        # live OFAC SDN list (~19k entities)
-python scripts/train_model.py             # trains on real PaySim if present, else synthetic
+python scripts/train_model.py             # trains on the real PaySim dataset
 uvicorn darksentinel.api.main:app --port 8000
 
 # 2. API gateway (seeds users + scores a realistic queue on boot)
@@ -258,8 +257,7 @@ land high or low — medium is genuinely rare; we show the real distribution.)
 ## API reference
 
 Base URL (dev): `http://localhost:4000/api`. All routes except login/refresh require a Bearer
-access token; authorization is per-route by RBAC permission. Full contract in
-[`docs/archive/04-api.md`](docs/archive/04-api.md).
+access token; authorization is per-route by RBAC permission.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -308,5 +306,4 @@ and an API-driven dark-themed console with no hardcoded values.
 
 **Designed with seams, not yet built:** MongoDB persistence (the in-memory store implements a
 Mongo-shaped interface), an async scoring queue + WebSocket push, Optuna tuning, the remaining
-graph/velocity features behind a batch job, and Docker/CI. The sequenced plan is in
-[`docs/archive/07-transformation-roadmap.md`](docs/archive/07-transformation-roadmap.md).
+graph/velocity features behind a batch job, and Docker/CI.
