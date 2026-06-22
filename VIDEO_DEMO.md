@@ -1,182 +1,279 @@
 # Video demo script — DarkSentinel AI
 
-A 5-minute walkthrough for the CodeQuest submission. Each section gives the **screen**, the
-**exact narration** (read it verbatim or paraphrase), and the **talking points** to hit. Total
-target: ~5:00. Practice once; the timings assume a calm pace.
+**Target runtime: 5:00.** Read narration at a calm pace (~125 words/min). Each section
+lists the exact screen, the verbatim narration, and the key talking points to land.
 
-> Setup before recording: all three services running, console at `http://localhost:5173`,
-> signed out. Dark theme (default). See `README.md` for start commands.
+> **Setup before recording:** all three services running, browser at `http://localhost:5173`,
+> signed out, dark theme (default). Run `README.md` quick-start to get there.
 
 ---
 
-## 0:00–0:30 — Opening & the problem
+## 0:00–0:20 — Opening & the problem
 
-**Screen:** Login page.
+**Screen:** Login page (dark, DarkSentinel logo centred).
 
 **Narration:**
-> "This is DarkSentinel — an explainable financial-crime intelligence platform. The problem
-> it solves: existing transaction-monitoring systems flag activity with a rule name and no
-> reasoning, so analysts drown in false positives and can't justify decisions. DarkSentinel
-> scores every transaction with a calibrated ML model, then explains *exactly why* —
-> grounding every word in computed evidence. The model decides; the explanation is computed;
-> the language layer only narrates."
+> "This is DarkSentinel — an explainable financial-crime intelligence platform. Existing
+> transaction-monitoring systems fire a rule name with no reasoning, so analysts drown in
+> false positives and can't justify decisions. DarkSentinel scores every transaction with a
+> calibrated model, then explains *exactly why* — grounding every word in computed evidence.
+> The model decides; SHAP explains; the language layer only narrates."
 
-**Talking points:** explainability gap · false-positive overload · "decide / explain /
-narrate" separation is the core idea.
-
-Click **Analyst** to sign in.
+Click **Analyst** (one-click role button) → sign in.
 
 ---
 
-## 0:30–1:30 — Dashboard: real metrics, no placeholders
+## 0:20–1:10 — Dashboard: real metrics, no placeholders
 
-**Screen:** Dashboard.
+**Screen:** Dashboard — severity cards on the left, **Model Health** card on the right,
+**Top Decision Signals** below.
+
+**Narration (severity cards):**
+> "The severity counts are live — three critical, nine high — every one from scoring real
+> transactions, not hardcoded KPIs."
+
+**Narration (model health card — read these exact numbers):**
+> "Over here is the model health card. The model ID is `ds-xgb-2026.06`, trained today.
+> PR-AUC is **1.000** — the precision-recall area over the full curve. ROC-AUC is **1.000**.
+> Precision is **100%**, recall **100%**. And here's the number that matters most —
+> the **Brier score: 3.0×10⁻⁶**. Brier measures *calibration* — how close the model's
+> probability is to the true observed frequency. Lower is better. Our calibrated XGBoost
+> lands at 3×10⁻⁶; the Random Forest baseline is 3×10⁻⁵ — one order of magnitude worse.
+> That gap is what isotonic calibration buys: when the model outputs 90%, it genuinely means
+> 90% fraud frequency at that score level."
+
+> "Below are the **Top Decision Signals** — global SHAP importance across all recent
+> scorings. The dominant signals are `error_balance_orig` (4.39), `zero_new_orig` (2.23),
+> and `orig_balance_ratio` (1.32). These are the PaySim balance-reconciliation features —
+> exactly what a human investigator checks: does the origin balance add up after the
+> transfer? These aren't our choices; SHAP found them automatically from the data."
+
+> "And before anyone asks — yes, 1.00 PR-AUC on PaySim. PaySim is a known highly-separable
+> dataset; fraud is mechanically tied to these balance features, so the published benchmarks
+> land here too. We guard leakage by dropping `isFlaggedFraud`, splitting chronologically,
+> and confirming that SHAP importance is spread across legitimate features, not any leak."
+
+**Talking points:** every number is API-driven · Brier = calibration · SHAP importance =
+interpretable feature ranking · leakage addressed proactively.
+
+---
+
+## 1:10–1:30 — Alert queue: the analyst worklist
+
+**Screen:** Alert Queue (all severities, default sort by score).
 
 **Narration:**
-> "Straight to the operational picture. These severity counts are live — three critical,
-> nine high, the rest low — every one computed by scoring real transactions, not a hardcoded
-> KPI. On the right is the model health card: this model is trained on the **real
-> 6.3-million-row PaySim dataset**. PR-AUC and ROC-AUC near 0.99 — and before you ask, that's
-> not leakage. PaySim is a known, highly-separable dataset where fraud is mechanically tied
-> to the balance features; the published benchmarks land here too. We guard leakage by
-> dropping the flagged-fraud column and splitting chronologically. The headline number is the
-> **Brier score** — it's three times better than the Random Forest baseline, which is what
-> *calibration* buys us: when the model says 90%, it means 90%."
-
-**Talking points:** every figure is API-driven · real PaySim · calibration (Brier) vs
-baseline · leakage addressed up front · "top decision signals" = global SHAP importance.
-
-Hover a severity card (it lifts); click **Critical** to filter the queue.
+> "The alert queue is the analyst worklist — every analyzed transaction, filterable by
+> severity, searchable, sortable by score, amount, or detection time. These scores are real:
+> the system seeds realistic transaction types — payments, cash-outs, mule funnels — and
+> routes all of them through the live ML service. Notice the range of types and the
+> timestamps spread across the past week. Let's do something first — submit a brand new
+> transaction for scoring."
 
 ---
 
-## 1:30–2:15 — Alert queue: a working desk
+## 1:30–2:00 — Score a new transaction
 
-**Screen:** Alert Queue (filtered to Critical, then clear to All).
+**Screen:** "Analyze Transaction" / Score form (accessible from the queue or nav). Fill in
+the fields exactly as shown while narrating:
 
-**Narration:**
-> "This is the analyst worklist — every analyzed transaction, filterable by severity,
-> searchable, and sortable by score, amount, or detection time. These aren't fixtures with
-> fake scores: the seed generates realistic transactions — payments, cash-outs, mule funnels
-> — and scores all of them through the live ML service. Notice the spread of types and the
-> detection timestamps across the week. Let's open the top critical alert."
+| Field | Value to enter |
+|---|---|
+| Type | `PAYMENT` |
+| Amount | `88000` |
+| Origin account | `C551903` |
+| Destination account | `C999001` |
+| Origin balance (before) | `88000` |
+| Origin balance (after) | `0` |
+| Dest balance (before) | `2000` |
+| Dest balance (after) | `2000` |
+| Counterparty name | `Nordstrand Maritime & Trading Co` |
 
-**Talking points:** real computed scores · varied types/timestamps · URL-driven filters
-(shareable) · click a row → full investigation.
+**Narration (while typing):**
+> "Let's submit a transaction with a PaySim-schema payload. The fields mirror what a real
+> core-banking export would send: transaction type, amount, origin and destination accounts,
+> the before-and-after balances for both sides, and the counterparty name. Notice the
+> balance fields — origin starts at 88,000 and ends at zero; the destination doesn't move.
+> That mismatch is exactly what the model is trained to catch. Counterparty is
+> 'Nordstrand Maritime & Trading Co' — that name will be screened live against OFAC."
 
-Click the top **critical** row.
+Click **Score Transaction**.
+
+**Narration (result appears):**
+> "The score returns synchronously — XGBoost, Isolation Forest, NetworkX, and RapidFuzz
+> OFAC screening all ran in one call. We can see the result in the queue immediately. Let's
+> now open the pre-scored critical alert for the same account to see the full investigation
+> view."
 
 ---
 
-## 2:15–3:45 — Risk analysis: the explainability core
+## 2:00–3:30 — Risk analysis: the explainability core
 
-**Screen:** Transaction Detail.
+**Screen:** Click the **score-92 TRANSFER · $88,000** alert from the queue.
 
-**Narration (summary banner + gauge):**
-> "Everything an analyst needs to triage, top to bottom. The banner gives the headline: a
-> critical score, the recommended action, the primary driver. The gauge breaks the composite
-> into its four independent signals — sixty percent fraud probability, fifteen each for
-> anomaly and graph structure, ten for sanctions. This isn't one black-box number; it's four
-> computed inputs you can inspect."
+**Narration (banner + composite gauge):**
+> "This is a TRANSFER of 88,000 from account C551903 — score 92 out of 100, Critical.
+> The recommended action is already here: *Escalate immediately; freeze pending review and
+> prepare a SAR.* That recommendation is computed from this transaction's evidence, not a
+> band lookup. The composite gauge breaks it down into four independent signals:
+> **Fraud probability × 0.60 = 100%** — the calibrated model's output.
+> **Anomaly score × 0.15 = 0.62** — Isolation Forest flagged this as anomalous against
+> legitimate traffic. **Graph risk × 0.15 = 0.90** — structural risk from the transaction
+> network. **Sanctions risk × 0.10 = 0.92** — the OFAC match. The formula is shown right
+> on screen: 0.60·fraud + 0.15·anomaly + 0.15·graph + 0.10·sanctions. No hidden
+> weighting."
 
-**Narration (SHAP):**
-> "Here's the part that matters — *why this score*. This is a SHAP waterfall: the exact
-> mathematical contribution of every feature to this specific prediction. The red bars pushed
-> it toward fraud — the origin balance doesn't reconcile, the account was drained to zero.
-> These aren't a template; SHAP gives the precise log-odds contribution per feature, and the
-> narrative is only allowed to restate these. The model cannot hallucinate a reason that
-> isn't on this chart."
+**Narration (SHAP waterfall — "Why this score" section):**
+> "Here's the core of the platform — the SHAP waterfall. These are the *exact additive
+> log-odds contributions* of every feature to this one prediction. The biggest driver:
+> **Origin balance does not reconcile — +7.55 log-odds.** Then origin left with zero
+> balance: +1.57. Amount versus prior origin balance: +1.34. Time of day: +0.80. Origin
+> account drained to zero: +0.68. Amount relative to destination balance: +0.60. The one
+> bar pushing *down* is the transfer type flag — a small negative. These numbers come from
+> `shap.TreeExplainer` — they are not a template, they are mathematically exact for this
+> transaction. The model cannot produce a different explanation retroactively."
 
-**Narration (graph):**
-> "Below, the transaction network. The origin account in the centre is a money mule — it
-> received from two accounts and forwarded the full balance one hop to a sanctioned entity,
-> shown in red. That's NetworkX computing betweenness, fan-in/out, and the shortest path to a
-> flagged node."
+**Narration (network graph):**
+> "Below is the transaction network — the local subgraph around origin account C551903.
+> NetworkX computed four metrics for us. First: **mule pattern — Yes.** C551903 received
+> funds from two accounts and forwarded the balance forward — that's the classic
+> receive-and-forward mule structure, captured as fan-in 2 / fan-out 2. Second:
+> **betweenness 0.333** — this account sits on one in three shortest paths in the local
+> graph, making it a funnel node. Third: **1 hop to a sanctioned entity** — the direct
+> path is C551903 → C999001, and C999001 is sanctioned, shown in red on the graph.
+> The graph_risk of 0.90 in the composite comes directly from these three findings."
 
 **Narration (sanctions + brief):**
-> "The counterparty name was screened with RapidFuzz against the **live OFAC sanctions list**
-> — nineteen thousand real entities — and matched at ninety-two percent. Finally, the
-> investigation brief: a grounded narrative where every sentence maps back to a number above.
-> The recommended action is *computed* from this transaction's evidence — escalate, confirm
-> the sanctions match and file a SAR, expand to the mule chain, trace the sanctioned path.
-> It's specific to this case, not a band lookup."
+> "Counterparty 'Nordstrand Maritime & Trading Co' was screened with RapidFuzz
+> `token_set_ratio` against all 19,073 OFAC SDN entities and 20,292 aliases in real time.
+> It matched **'NORDSTRAND MARITIME AND TRADING COMPANY'** — Cuba, Greece program —
+> at **92% similarity**, just above our 88% threshold. Manual confirmation is flagged.
+>
+> Finally, the investigation brief. Every sentence here maps to a number from the sections
+> above — the model log-odds, the SHAP attribution, the graph metrics, the sanctions match.
+> The narrator received only the computed contributing factors; it never saw the raw
+> transaction, so it cannot invent a reason that isn't on the SHAP chart. By default this
+> is fully deterministic; Claude is an opt-in upgrade on the same grounded inputs."
 
-**Talking points:** four-signal composite · SHAP = exact, not template · graph mule + OFAC
-path · real OFAC list · grounded brief · computed recommendation.
+**Talking points:** four-signal composite · SHAP is exact not template · mule pattern =
+graph structure · real OFAC match · grounded brief = anti-hallucination.
 
 Click **Generate investigation report**.
 
 ---
 
-## 3:45–4:15 — Report & PDF
+## 3:30–4:00 — Reports page
 
-**Screen:** Report view (print-ready), then the Export PDF dialog.
+**Screen:** Report view (full page, print-ready layout), then the **Export PDF** / print
+dialog.
 
 **Narration:**
-> "One click snapshots the assessment into an immutable, point-in-time report — re-scoring
-> later won't change a filed report. It's print-ready: Export to PDF gives a clean,
-> vector-text document for the case file. The report carries the model version, so every
-> decision is traceable to the exact model that produced it."
+> "One click on 'Generate investigation report' snapshots the entire assessment into an
+> immutable, point-in-time record. Re-scoring this transaction later won't alter a filed
+> report — it's audit-grade. The report page assembles everything: the composite score and
+> breakdown, the SHAP waterfall, the network graph findings, the sanctions result, and the
+> full investigation brief — all in a clean, print-ready layout. Click **Export to PDF**
+> and the browser's print dialog gives you a vector-text PDF suitable for a compliance case
+> file. The report is stamped with the **model version** — `ds-xgb-2026.06` — so every
+> decision is traceable to the exact model artifact that produced it. Reports are accessible
+> under the **Reports** tab in the nav; an analyst can pull any previous report without
+> re-running the model."
 
-**Talking points:** immutable snapshot · audit-grade · print-to-PDF · model version stamped.
+**Talking points:** immutable snapshot · model version stamped · print-to-PDF · case-file
+ready · accessible from Reports nav tab without re-scoring.
 
 ---
 
-## 4:15–4:45 — Governance: RBAC, audit, themes
+## 4:00–4:35 — Admin: sign in and user management
 
-**Screen:** Sign out → sign in as **Risk Manager** → open Audit Log. Toggle theme once.
+**Screen:** Sign out → Login page → click **Admin** (one-click role button) → sign in.
+Navigate to **Administration** tab.
 
 **Narration:**
-> "Governance is built in. Roles gate what each persona sees — an analyst can't reach the
-> audit log; a risk manager can. Every analyze and report action is recorded immutably: who,
-> what, when. Auth is JWT RS256 with role-based access enforced on the server. And for
-> analysts who stare at this all day — a one-click light theme."
+> "Now let's sign in as the Admin role to show the governance layer.
+> Email is `admin@darksentinel.io`, password `Admin#2026` — or just hit the Admin button.
+>
+> The Administration page shows the full **user directory** — all provisioned accounts, their
+> roles, and status. From here an admin can see who has analyst access, who has risk manager
+> access, and manage that list. User provisioning is **server-enforced** — the register
+> endpoint requires a valid admin JWT; a client-side bypass won't work. Roles are checked on
+> every route, not just the UI — an analyst hitting an admin endpoint gets a real HTTP 403,
+> not just a hidden button. The three roles are: **Analyst** (queue, risk analysis, reports),
+> **Risk Manager** (everything an analyst sees, plus the audit log), and **Admin** (everything
+> plus user provisioning and the audit log)."
 
-**Talking points:** RBAC enforced server-side (real 403s) · immutable audit · JWT RS256 ·
-dark/light.
+**Talking points:** RBAC is server-side (real 403s) · three roles with different route
+permissions · admin-only user provisioning · JWT RS256 enforced at the gateway.
 
 ---
 
-## 4:45–5:00 — Close
+## 4:35–4:50 — Audit log
 
-**Screen:** Back to the dashboard.
+**Screen:** Navigate to **Audit Log** (visible because we're admin).
 
 **Narration:**
-> "To recap: a calibrated model trained on six million real transactions decides; SHAP and a
-> NetworkX graph explain; RapidFuzz screens the live OFAC list; and a grounded narrative
-> turns it into an analyst-ready brief — with no hardcoded values anywhere in the product.
-> That's DarkSentinel: explainable financial-crime intelligence."
+> "Every action — analyze, generate report, login, user creation — is written to an
+> immutable audit log with the actor, timestamp, and action type. An analyst role cannot
+> reach this endpoint; trying returns a 403. This is the compliance layer: every decision
+> in the system is traceable to who triggered it and when."
 
 ---
 
-## Reference: the one-line explanations (if a judge asks)
+## 4:50–5:00 — Close
+
+**Screen:** Back to the Dashboard.
+
+**Narration:**
+> "To recap: a calibrated model trained on 6.3 million real transactions decides the risk.
+> SHAP gives the exact per-feature explanation. NetworkX detects mule structure and
+> sanctioned-path proximity. RapidFuzz screens the live OFAC list. And a grounded narrator
+> turns it into an analyst-ready brief — with no hardcoded values, no placeholder metrics,
+> and no invented reasoning anywhere in the product. That's DarkSentinel."
+
+---
+
+## Reference: demo credentials
+
+| Role | Email | Password | One-click |
+|---|---|---|---|
+| Analyst | `analyst@darksentinel.io` | `Analyst#2026` | ✅ |
+| Risk Manager | `manager@darksentinel.io` | `Manager#2026` | ✅ |
+| Admin | `admin@darksentinel.io` | `Admin#2026` | ✅ |
+
+---
+
+## Reference: one-liners if a judge asks
 
 - **Architecture.** React console → Express gateway (auth, RBAC, audit) → FastAPI ML service.
-  The gateway owns trust; the ML service owns math and is stateless.
-- **ML.** XGBoost on real PaySim, isotonic-calibrated so the probability is meaningful; an
-  Isolation Forest adds an unsupervised anomaly lens. Trained with a chronological split and
-  undersample+SMOTE on the train fold only.
-- **SHAP.** `TreeExplainer` returns the exact additive contribution of each feature to the
-  model's output for one transaction. It's what makes "why" defensible rather than guessed.
-- **Graph.** Accounts are nodes, transfers are edges. NetworkX computes centrality, detects
-  receive-and-forward mule structure, and finds the shortest path to a sanctioned account.
-- **Sanctions.** The live OFAC SDN list (~19k entities, ~20k aliases) is ingested and matched
-  with RapidFuzz token-set similarity; FATF jurisdictions add a country-risk signal.
-- **Anti-hallucination.** The narrator receives only the computed evidence (SHAP, graph,
-  sanctions) — never the raw transaction — and is instructed to narrate, not decide. By
-  default it's fully deterministic; Claude is an opt-in upgrade on the same grounded inputs.
+  Gateway owns trust; ML service owns math and is stateless.
+- **ML.** XGBoost on real PaySim (6.3M rows), isotonic-calibrated so probabilities are
+  honest; Isolation Forest adds an unsupervised anomaly lens. Chronological split;
+  RandomUnderSampler + SMOTE on training fold only.
+- **SHAP.** `TreeExplainer` returns the exact additive log-odds contribution of every feature
+  to one prediction. That's what makes "why" defensible rather than generated.
+- **Graph.** Accounts are nodes, transfers are edges. NetworkX computes degree/betweenness/
+  eigenvector centrality, detects receive-and-forward mule patterns via fan-in/out, finds
+  the shortest path to a sanctioned node, and propagates risk through neighbours.
+- **Sanctions.** Live OFAC SDN list (~19k entities, ~20k aliases) ingested on boot. Matched
+  with RapidFuzz `token_set_ratio` at an 88% threshold; FATF country-risk adds a
+  jurisdiction signal.
+- **Anti-hallucination.** The narrator gets only the computed `contributing_factors` (SHAP +
+  graph + sanctions) — never the raw transaction. Deterministic by default; Claude is
+  opt-in on the same grounded inputs.
 
-## Likely questions & best answers
+## Likely judge questions
 
-- *"Is the data real?"* — Yes: the model trains on the full 6.3M-row PaySim dataset and
-  sanctions screen against the live OFAC list. Only the seeded *inputs* are curated; every
+- *"Is the data real?"* — Yes: model trains on the full 6.3M-row PaySim CSV; sanctions
+  screen against the live OFAC download. Only the seeded *inputs* are curated; every
   *output* is computed. See `DATA_PROVENANCE.md`.
-- *"Why is PR-AUC so high?"* — PaySim is highly separable by design; this is the documented
-  norm. Leakage is guarded (no `isFlaggedFraud`, chronological split, importance spread across
-  legitimate features).
-- *"Why no medium-severity alerts?"* — The calibrated model is decisive on PaySim (outputs
-  near 0 or 1), so transactions land high or low; medium is genuinely rare. We show the real
-  distribution rather than manufacture one.
+- *"Why is PR-AUC 1.000?"* — PaySim fraud is highly separable by design (balance
+  reconciliation features). Published benchmarks land here too. Leakage is guarded: no
+  `isFlaggedFraud`, chronological split, SHAP importance spread across legitimate features.
+- *"Why no medium alerts?"* — The calibrated model is decisive on PaySim; outputs cluster
+  near 0 or 1. Medium is genuinely rare; we show the real distribution.
 - *"What's not production-grade yet?"* — Persistence is in-memory behind a Mongo-shaped
-  interface; the async queue, WebSocket push, and Docker/CI are designed with seams in place.
-  See `docs/archive/07-transformation-roadmap.md`.
+  interface; async scoring queue and WebSocket push are designed but not wired; Docker/CI
+  not set up. See `docs/archive/07-transformation-roadmap.md`.
+- *"Is Claude always running?"* — No. Default narrator is fully deterministic. Claude
+  activates only when `ANTHROPIC_API_KEY` is set; it runs on the same grounded inputs
+  either way.
