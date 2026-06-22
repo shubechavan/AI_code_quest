@@ -29,8 +29,7 @@ React (analyst UI)
 | `frontend/`   | React, Vite, Tailwind          | Analyst console (risk analysis, SHAP, graph)             |
 | `datasets/`   | —                              | Data card (PaySim placement, sanctions ingestion)        |
 
-Top-level docs: [`documentation.md`](documentation.md) · [`ARCHITECTURE.md`](ARCHITECTURE.md) ·
-[`VIDEO_DEMO.md`](VIDEO_DEMO.md) · [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md).
+Top-level docs: [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`DATA_PROVENANCE.md`](DATA_PROVENANCE.md).
 
 ## Quick start
 
@@ -52,8 +51,13 @@ cd frontend
 npm install && npm run dev           # :5173
 ```
 
-Default demo credentials and seeded scenarios are documented in
-[`VIDEO_DEMO.md`](VIDEO_DEMO.md) and [`documentation.md`](documentation.md).
+Default demo accounts (the login screen has one-click role buttons):
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Analyst | `analyst@darksentinel.io` | `Analyst#2026` |
+| Risk Manager | `manager@darksentinel.io` | `Manager#2026` |
+| Admin | `admin@darksentinel.io` | `Admin#2026` |
 
 ## Design principles
 
